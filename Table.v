@@ -126,8 +126,8 @@ Proof.
 Abort.
 (** these proofs are hardddddddddd :( **)
 
-Theorem remove_first_row_is_inverse_of_add_row : forall (r: row) (h: header) ,
-    remove_first_row_from_table r (add_row r (add_header h (empty_table))) = add_header h (empty_table).
+Theorem remove_first_inverse_of_add_row_on_headed_empty_table : forall (r: row) (h: header) ,
+    remove_first_row_from_table r (add_row r (add_header h empty_table)) = (add_header h empty_table).
 Proof.
   intros r h.
   simpl. induction r.
