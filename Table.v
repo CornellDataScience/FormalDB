@@ -79,4 +79,54 @@ Theorem tbl_unit_test_2 :
   filter_table_by_entry (entry_is_string "Ahad") ("Name") (test_tbl_1) = test_tbl_1.
 Proof. reflexivity. Qed.
 
+(** END unit tests **)
+Theorem filter_row_true_implies_length_match : forall (r: row) (h: header) (col_ident : string) (f: entry -> bool),
+    filter_row_by_entry f col_ident h r = true -> List.length h = List.length r.
+Proof.
+  intros r h col_ident f H.
+Abort.
+(** these proofs are hardddddddddd :( **)
+
+(** The false filter is like 0 if filtering is mulitplication *)
+Lemma name_this : forall (r : row) (h: header) (col_ident : string) (a: entry) (f: entry -> bool),
+    f = (fun e => false) -> filter_row_by_entry f col_ident h (a::r) = filter_row_by_entry f col_ident h r.
+Proof.
+  intros r h col_ident a f H_f.
+  induction r.
+  +induction h.
+  -simpl. reflexivity.
+  -simpl. destruct (string_dec col_ident a0) eqn:H_eq.
+   -- rewrite H_f. reflexivity.
+   -- induction h.
+      --- reflexivity.
+      --- reflexivity.
+   + induction h.
+  - simpl. reflexivity.
+  - simpl. destruct (string_dec col_ident a1) eqn: Heq.
+    -- rewrite H_f. reflexivity.
+    -- 
+  +induction h.
+  -simpl. reflexivity.
+  -simpl. destruct (string_dec col_ident a1) eqn:Heq.
+   --rewrite H_f. reflexivity.
+   -- 
+Abort.
+Theorem filter_property_of_false_filter_on_rows : forall (r : row) (h: header) (col_ident : string) (f: entry -> bool),
+    f = (fun e => false) -> filter_row_by_entry f col_ident h r = false.
+Proof.
+  intros r h col_ident f H.
+  induction h.
+  + induction r.
+  -reflexivity.
+  -reflexivity.
+   + destruct (string_dec col_ident a) eqn:Heq.
+  - destruct r. reflexivity. simpl. rewrite Heq. rewrite H. reflexivity.
+  - induction r.
+    -- reflexivity.
+    -- simpl. rewrite Heq. apply IHr.
+    induction r.
+  - reflexivity.
+  - unfold filter_row_by_entry. destruct (string_dec col_ident a) eqn:Heqn.
+    -- rewrite H. reflexivity.
+    -- 
 End Table.
