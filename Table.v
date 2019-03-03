@@ -45,7 +45,7 @@ Fixpoint row_eqb (r1: row) (r2: row) :=
   | e1::tl1, e2::tl2 => andb (entry_eqb e1 e2) (row_eqb tl1 tl2)
   | _, _ => false
   end.
-
+  
 Fixpoint remove_first_row_from_row_list (r: row) (row_list : list row) :=
   match row_list with
   | [] => []
