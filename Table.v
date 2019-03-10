@@ -1,12 +1,18 @@
 Require Import List Arith Bool Ascii String.
 Require String.
 Import ListNotations.
+From Coq Require Extraction.
 Module Table.
 Open Scope string_scope.
 
+Definition string_eq s1 s2 : bool:=
+  if (string_dec s1 s2) then true else false.
+
 Inductive entry :=
     | string_entry (s: string)
-    | nat_entry (n : nat).
+    | nat_entry (n : nat)
+    | nil_entry.
+
 
 Definition row : Type :=
     list entry.
@@ -25,13 +31,62 @@ Definition empty_table : table
 
 Definition add_header (h : header) (tbl: table) :=
   match tbl with
-  | (t, old_h) => (t, h)
+  | (rowlist, old_h) => match rowlist with
+                        | [] => (rowlist, h)
+                        | _ => (rowlist, old_h)
+                        end
+  end.
+Definition entry_type_match (e1 : entry) (e2: entry) :=
+  match e1, e2 with
+  | string_entry _, string_entry _ => true
+  | nat_entry _, nat_entry _ => true
+  | nil_entry, _ => true
+  | _, nil_entry => true
+  | _, _ => false
+  end.
+
+Definition entry_type_match_prop (e1 : entry) (e2: entry) :=
+  match e1, e2 with
+  | string_entry _, string_entry _ => True
+  | nat_entry _, nat_entry _ => True
+  | nil_entry, _ => True
+  | _, nil_entry => True
+  | _, _ => False
+  end.
+
+Fixpoint row_validity_2_3_bool (r1 : row) (r2: row) :=
+  match r1, r2 with
+  | [],[] => true
+  | e1::tl1, e2::tl2 => andb (entry_type_match e1 e2) (row_validity_2_3_bool tl1 tl2)
+  | _, _ => false
+  end.
+
+Fixpoint row_validity_2_3 (r1 : row) (r2: row) :=
+  match r1, r2 with
+  | [],[] => True
+  | e1::tl1, e2::tl2 => (entry_type_match_prop e1 e2) /\ (row_validity_2_3 tl1 tl2)
+  | _, _ => False
+  end.
+
+Definition row_validity_2_3_table (r : row) (rowlist : list row) :=
+  match rowlist with
+  | [] => true
+  | first_row::row_tail => row_validity_2_3_bool first_row r
+  end.
+
+Definition header_matches_first_row (h : header) (r : row) (rowlist : list row) :=
+  match rowlist with
+  | [] => List.length h =? List.length r
+  | _ => true
   end.
 
 Definition add_row (r : row) (tbl : table) :=
     match tbl with 
-    | (t, ident) => (r::t, ident)
+    | (t, ident) => if
+        (andb (header_matches_first_row ident r t) (row_validity_2_3_table r t))
+      then ((r::t, ident)) else ((t, ident))
     end.
+
 Definition entry_eqb (e1: entry) (e2: entry) :=
   match e1, e2 with
   | string_entry s1, string_entry s2 => if (string_dec s1 s2) then true else false
@@ -131,22 +186,34 @@ Theorem remove_first_inverse_of_add_row_on_headed_empty_table : forall (r: row) 
 Proof.
   intros r h.
   simpl. induction r.
-  - simpl. reflexivity.
+  - simpl. destruct (Datatypes.length h =? 0) eqn:Heq.
+    + simpl. reflexivity.
+    + simpl. reflexivity.
   - simpl. destruct a.
     -- simpl. destruct (string_dec s s). simpl. destruct (row_eqb r r).
-    + reflexivity.
-    + reflexivity.
+    + simpl. destruct (Datatypes.length h =? S (Datatypes.length r)) eqn:Heq.
+      ++ simpl. destruct (string_dec s s). simpl. destruct (row_eqb r r). reflexivity.
+         reflexivity. simpl. reflexivity.
+      ++ simpl. reflexivity.
+    + destruct (Datatypes.length h =? S (Datatypes.length r)) eqn:Heq. simpl.
+      destruct (string_dec s s). simpl. destruct (row_eqb r r). reflexivity. reflexivity.
+      simpl. reflexivity. simpl. reflexivity.
     + destruct n. reflexivity.
     -- simpl. induction n.
-    + simpl. destruct (row_eqb r r). reflexivity. reflexivity.
-    + simpl. apply IHn.
+    + simpl. destruct (Datatypes.length h =? S (Datatypes.length r)) eqn:Heq. simpl.
+      destruct (row_eqb r r). simpl. reflexivity. reflexivity. simpl. reflexivity. 
+    +simpl.  destruct (Datatypes.length h =? S (Datatypes.length r)) eqn:Heq. simpl.
+     rewrite Nat.eqb_refl. simpl. destruct (row_eqb r r). reflexivity.
+     reflexivity. simpl. reflexivity.
+     -- destruct (Datatypes.length h =? S (Datatypes.length r)) eqn:Heq. simpl. reflexivity.
+        simpl. reflexivity.
 Qed.
 
 (** The false filter is like 0 if filtering is mulitplication *)
 Lemma name_this : forall (r : row) (h: header) (col_ident : string) (a: entry) (f: entry -> bool),
     f = (fun e => false) -> filter_row_by_entry f col_ident h (a::r) = filter_row_by_entry f col_ident h r.
 Proof.
-  intros r h c;ol_ident a f H_f.
+  intros r h col_ident a f H_f.
   induction r.
   +induction h.
   -simpl. reflexivity.
@@ -159,12 +226,6 @@ Proof.
   - simpl. reflexivity.
   - simpl. destruct (string_dec col_ident a1) eqn: Heq.
     -- rewrite H_f. reflexivity.
-    -- 
-  +induction h.
-  -simpl. reflexivity.
-  -simpl. destruct (string_dec col_ident a1) eqn:Heq.
-   --rewrite H_f. reflexivity.
-   -- 
 Abort.
 Theorem filter_property_of_false_filter_on_rows : forall (r : row) (h: header) (col_ident : string) (f: entry -> bool),
     f = (fun e => false) -> filter_row_by_entry f col_ident h r = false.
@@ -178,11 +239,6 @@ Proof.
   - destruct r. reflexivity. simpl. rewrite Heq. rewrite H. reflexivity.
   - induction r.
     -- reflexivity.
-    -- simpl. rewrite Heq. apply IHr.
-    induction r.
-  - reflexivity.
-  - unfold filter_row_by_entry. destruct (string_dec col_ident a) eqn:Heqn.
-    -- rewrite H. reflexivity.
-    --
+    -- simpl. rewrite Heq.
 Abort.
 End Table.

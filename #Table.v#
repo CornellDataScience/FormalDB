@@ -1,8 +1,12 @@
 Require Import List Arith Bool Ascii String.
 Require String.
 Import ListNotations.
+From Coq Require Extraction.
 Module Table.
 Open Scope string_scope.
+
+Definition string_eq s1 s2 : bool:=
+  if (string_dec s1 s2) then true else false.
 
 Inductive entry :=
     | string_entry (s: string)
@@ -209,7 +213,7 @@ Qed.
 Lemma name_this : forall (r : row) (h: header) (col_ident : string) (a: entry) (f: entry -> bool),
     f = (fun e => false) -> filter_row_by_entry f col_ident h (a::r) = filter_row_by_entry f col_ident h r.
 Proof.
-  intros r h c;ol_ident a f H_f.
+  intros r h col_ident a f H_f.
   induction r.
   +induction h.
   -simpl. reflexivity.
@@ -222,12 +226,6 @@ Proof.
   - simpl. reflexivity.
   - simpl. destruct (string_dec col_ident a1) eqn: Heq.
     -- rewrite H_f. reflexivity.
-    -- 
-  +induction h.
-  -simpl. reflexivity.
-  -simpl. destruct (string_dec col_ident a1) eqn:Heq.
-   --rewrite H_f. reflexivity.
-   -- 
 Abort.
 Theorem filter_property_of_false_filter_on_rows : forall (r : row) (h: header) (col_ident : string) (f: entry -> bool),
     f = (fun e => false) -> filter_row_by_entry f col_ident h r = false.
@@ -241,11 +239,9 @@ Proof.
   - destruct r. reflexivity. simpl. rewrite Heq. rewrite H. reflexivity.
   - induction r.
     -- reflexivity.
-    -- simpl. rewrite Heq. apply IHr.
-    induction r.
-  - reflexivity.
-  - unfold filter_row_by_entry. destruct (string_dec col_ident a) eqn:Heqn.
-    -- rewrite H. reflexivity.
-    --
+    -- simpl. rewrite Heq.
 Abort.
 End Table.
+Extraction Language OCaml.
+Recursive Extraction Table.
+Extraction Library Top.Table.
