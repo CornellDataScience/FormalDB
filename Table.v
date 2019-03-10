@@ -21,7 +21,17 @@ Definition header : Type :=
   list string.
 
 Definition table : Type :=
-    (list row) * (header).
+  (list row) * (header).
+
+Definition get_rowlist (tbl : table) :=
+  match tbl with
+  | (rowlist, _) => rowlist
+  end.
+
+Definition get_header (tbl: table) :=
+  match tbl with
+  | (_, h) => h
+  end.
 
 Check table.
 Check row.
@@ -141,6 +151,47 @@ Fixpoint filter_table_by_entry (f: entry -> bool) (hdr : string) (tbl : table) :
   | (t, h) => ((filter_table_by_entry_helper f hdr t h), h)
   end.
 
+Inductive table_valid_1 (tbl : table) : Prop :=
+| same_length (h : header) (fst_row : list entry) (rowlist : list row) :
+    get_header tbl = h -> get_rowlist tbl = rowlist -> List.length h = List.length fst_row ->  (exists tl, rowlist = fst_row::tl) -> table_valid_1 tbl
+| empty_header_valid (h : header) (rowlist : list row) :
+    get_header tbl = h -> get_rowlist tbl = rowlist -> h = [] -> rowlist = [] -> table_valid_1 tbl
+| empty_rowlist_valid (rowlist : list row) : 
+	get_rowlist tbl = rowlist -> rowlist = [] -> table_valid_1 tbl.
+
+
+Fixpoint all_rows_same_length (rowlist: list row) : Prop :=
+  match rowlist with
+  | [] => True
+  | h::[] => True
+  | h1::tl => match tl with
+              | [] => True
+              | h2::tl2 => ((List.length h1) =
+                            (List.length h2)) /\ (all_rows_same_length tl)
+              end
+  end.
+
+Inductive table_valid_2 (tbl : table) : Prop :=
+| rows_same_length (rowlist : list row) :
+    get_rowlist tbl = rowlist -> all_rows_same_length (rowlist) -> table_valid_2 tbl.
+
+Fixpoint all_cols_same_type (rowlist : list row) : Prop :=
+  match rowlist with
+  | [] => True
+  | h::[] => True
+  | h1::tl => match tl with
+              | [] => True
+              | h2::tl2 => (row_validity_2_3 h1 h2) /\ (all_cols_same_type tl)
+              end
+  end.
+
+Inductive table_valid_3 (tbl : table) : Prop :=
+| cols_same_type (rowlist : list row) : get_rowlist tbl = rowlist -> all_cols_same_type (rowlist) -> table_valid_3 tbl.
+                                                                                           
+Inductive table_valid (tbl : table) : Prop :=
+| valid_1_2_3 : table_valid_1 tbl -> table_valid_2 tbl -> table_valid_3 tbl ->
+                table_valid tbl.
+
 (** Unit tests with definitions so far **)
 Let test_tbl :=
   add_header ([ "Name" ; "Year" ;"Address" ; "Major" ]) empty_table.
@@ -167,6 +218,37 @@ Proof. simpl. unfold test_tbl. simpl. reflexivity. Qed.
 Theorem tbl_unit_test_2 :
   filter_table_by_entry (entry_is_string "Ahad") ("Name") (test_tbl_1) = test_tbl_1.
 Proof. reflexivity. Qed.
+
+Theorem add_header_table_is_valid : forall (h : header) (tbl: table),
+    table_valid tbl -> table_valid (add_header h tbl).
+Proof.
+  induction h.
+  + induction tbl.
+    ++ intros H. apply valid_1_2_3.
+       +++ simpl. destruct a eqn:Ha.
+           ++++ apply empty_header_valid with (h:=[]) (rowlist:=[]); try (reflexivity).
+           ++++ induction b.
+  - destruct H. apply H.
+  - destruct H. apply H.
+    +++ destruct H. destruct a.
+        ++++ simpl. apply rows_same_length with (rowlist := []).
+             reflexivity. simpl. trivial.
+        ++++ simpl. apply H0.
+    +++ destruct H. destruct a.
+        ++++ simpl. apply cols_same_type with (rowlist:=[]).
+  - simpl. reflexivity.
+  - simpl. trivial.
+    ++++ simpl. apply H1.
+  + intros tbl. induction tbl.
+    ++ intros H. apply valid_1_2_3.
+       +++ destruct H. destruct a0 eqn:Ha0.
+           ++++ simpl. apply empty_rowlist_valid with (rowlist:=[]).
+  - reflexivity.
+  - reflexivity.
+    ++++ simpl. apply H.
+      +++simpl.
+    
+           
 
 (** END unit tests **)
 Theorem filter_row_true_implies_length_match : forall (r: row) (h: header) (col_ident : string) (f: entry -> bool),
