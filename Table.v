@@ -91,7 +91,8 @@ Definition header_matches_first_row (h : header) (r : row) (rowlist : list row) 
   end.
 
 Definition add_row (r : row) (tbl : table) :=
-    match tbl with 
+  match tbl with
+    | (_, []) => tbl
     | (t, ident) => if
         (andb (header_matches_first_row ident r t) (row_validity_2_3_table r t))
       then ((r::t, ident)) else ((t, ident))
@@ -246,9 +247,46 @@ Proof.
   - reflexivity.
   - reflexivity.
     ++++ simpl. apply H.
-      +++simpl.
-    
-           
+    +++ destruct a0 eqn:Ha0.
+  - simpl. apply rows_same_length with (rowlist:=[]).
+    -- reflexivity.
+    -- simpl. trivial.
+  - simpl. destruct H. apply H0.
+    +++ destruct a0.
+  - simpl. apply cols_same_type with (rowlist:=[]).
+    -- reflexivity.
+    -- simpl. trivial.
+  - simpl. destruct H. apply H1.
+Qed.
+
+Theorem empty_table_is_valid : table_valid empty_table.
+Proof.
+  apply valid_1_2_3. unfold empty_table.
+  + apply empty_rowlist_valid with (rowlist:=[]); try (reflexivity).
+  + apply rows_same_length with (rowlist:=[]); try (reflexivity).
+  + apply cols_same_type with (rowlist:=[]); try (reflexivity).
+Qed.
+
+Theorem add_row_table_is_valid : forall (r: row) (tbl : table),
+    table_valid tbl -> table_valid (add_row r tbl).
+Proof.
+  induction r.
+  + intros tbl. intros H. induction tbl. simpl.
+    destruct (header_matches_first_row b [] a) eqn:Heq.
+    ++ destruct (row_validity_2_3_table [] a) eqn:Hrow_valid.
+       +++ simpl. destruct b eqn:Hheader. (** destruct on the header **)
+           destruct a eqn:Hrowlist.
+  - apply H.
+  - apply H.
+  - destruct a eqn:Hrowlist.
+    -- simpl in Heq. discriminate. 
+  - apply valid_1_2_3.
+    * apply empty_header_valid with (rowlist:=[[]]) (h:=[]); try (reflexivity).
+      ** simpl. reflexivity.
+      ** simpl. try (reflexivity).
+      * apply rows_same_length with (rowlist:=[]); try (reflexivity).
+      * apply cols_same_type with (rowlist:=[]); try (reflexivity).
+       
 
 (** END unit tests **)
 Theorem filter_row_true_implies_length_match : forall (r: row) (h: header) (col_ident : string) (f: entry -> bool),
