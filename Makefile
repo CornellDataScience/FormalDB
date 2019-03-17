@@ -7,7 +7,7 @@ TEST_CMD=test_commands.byte
 TEST_DIFF=diff_tester.byte
 MAIN=Table.byte
 OCAMLBUILD=ocamlbuild -use-ocamlfind -pkgs $(PKGS)
-PKGS=csv
+PKGS=CSV
 
 default: build
 	utop
