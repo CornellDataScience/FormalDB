@@ -1,7 +1,8 @@
 ### Starting build.
 # Target: Table.ml.depends, tags: { package(csv), package(unix), extension:ml, file:Table.ml, ocaml, ocamldep, quiet, traverse }
 ocamlfind ocamldep -package unix -package csv -modules Table.ml > Table.ml.depends
-+ ocamlfind ocamldep -package unix -package csv -modules Table.ml > Table.ml.depends
-ocamlfind: Package `csv' not found
-Command exited with code 2.
-# Compilation unsuccessful.
+# Target: Table.cmo, tags: { package(csv), package(unix), byte, compile, extension:cmo, extension:ml, file:Table.cmo, file:Table.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package unix -package csv -o Table.cmo Table.ml
+# Target: Table.byte, tags: { package(csv), package(unix), byte, dont_link_with, extension:byte, file:Table.byte, link, ocaml, program, quiet, traverse }
+ocamlfind ocamlc -linkpkg -package unix -package csv Table.cmo -o Table.byte
+# Compilation successful.
