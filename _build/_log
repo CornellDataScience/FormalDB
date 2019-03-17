@@ -1,0 +1,7 @@
+### Starting build.
+# Target: Table.ml.depends, tags: { package(csv), package(unix), extension:ml, file:Table.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package unix -package csv -modules Table.ml > Table.ml.depends
++ ocamlfind ocamldep -package unix -package csv -modules Table.ml > Table.ml.depends
+ocamlfind: Package `csv' not found
+Command exited with code 2.
+# Compilation unsuccessful.
