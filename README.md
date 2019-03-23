@@ -1,0 +1,2 @@
+# FormalDB
+We are setting out to build a prototype formally verified database system. Formal verification is a technique of mathematically proving certain functionality and algorithms. Essentially pre and post conditions are represented as mathematical theorems and proven with a mechanical proof solving system. The core system would be built in Coq and compiled down to OCaml. I/O and command parsing will be written in OCaml.
