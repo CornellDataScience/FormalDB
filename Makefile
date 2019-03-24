@@ -7,7 +7,7 @@ TEST_CMD=test_commands.byte
 TEST_DIFF=diff_tester.byte
 MAIN=Table.byte
 OCAMLBUILD=ocamlbuild -use-ocamlfind -pkgs $(PKGS)
-PKGS=CSV
+PKGS=csv
 
 default: build
 	utop
@@ -43,5 +43,7 @@ clean:
 
 zip:
 	zip git-ml_src.zip *.ml* _tags git-ml test_routine Makefile
+production:
+	node formal_db_server.js & echo "$$!" > server_pid.txt
 
 rebuild: clean build
