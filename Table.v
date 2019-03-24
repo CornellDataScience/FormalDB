@@ -13,7 +13,6 @@ Inductive entry :=
     | nat_entry (n : nat)
     | nil_entry.
 
-
 Definition row : Type :=
     list entry.
 
@@ -23,11 +22,13 @@ Definition header : Type :=
 Definition table : Type :=
   (list row) * (header).
 
+(** [get_rowlist] is the list of rows from table [tbl] *)
 Definition get_rowlist (tbl : table) :=
   match tbl with
   | (rowlist, _) => rowlist
   end.
 
+(** [get_header] is the header of table [tbl] *)
 Definition get_header (tbl: table) :=
   match tbl with
   | (_, h) => h
@@ -39,6 +40,8 @@ Check row.
 Definition empty_table : table 
     := (@nil (row), nil).
 
+(** [add_header] adds header [h] to table [tbl] if [tbl] is empty.
+Returns old table if [tbl] is not empty. *)
 Definition add_header (h : header) (tbl: table) :=
   match tbl with
   | (rowlist, old_h) => match rowlist with
@@ -46,6 +49,8 @@ Definition add_header (h : header) (tbl: table) :=
                         | _ => (rowlist, old_h)
                         end
   end.
+
+(** [entry_type_match] checks if entries [e1] and [e2] are of the same type *)
 Definition entry_type_match (e1 : entry) (e2: entry) :=
   match e1, e2 with
   | string_entry _, string_entry _ => true
@@ -55,6 +60,8 @@ Definition entry_type_match (e1 : entry) (e2: entry) :=
   | _, _ => false
   end.
 
+(** [entry_type_match_prop] checks is entries [e1] and [e2] are of the same
+type for propositions *)
 Definition entry_type_match_prop (e1 : entry) (e2: entry) :=
   match e1, e2 with
   | string_entry _, string_entry _ => True
@@ -64,6 +71,9 @@ Definition entry_type_match_prop (e1 : entry) (e2: entry) :=
   | _, _ => False
   end.
 
+(** [row_validity_2_3_bool] takes in row [r1] and [r2] and checks
+if the entry in a row is the same as the entry in the row before it
+at the same index *)
 Fixpoint row_validity_2_3_bool (r1 : row) (r2: row) :=
   match r1, r2 with
   | [],[] => true
@@ -71,6 +81,9 @@ Fixpoint row_validity_2_3_bool (r1 : row) (r2: row) :=
   | _, _ => false
   end.
 
+(** [row_validity_2_3_bool] takes in row [r1] and [r2] and checks
+if the entry in a row is the same as the entry in the row before it
+at the same index for propositions *)
 Fixpoint row_validity_2_3 (r1 : row) (r2: row) :=
   match r1, r2 with
   | [],[] => True
@@ -78,18 +91,25 @@ Fixpoint row_validity_2_3 (r1 : row) (r2: row) :=
   | _, _ => False
   end.
 
+(** [row_validity_2_3_table] checks that every entry in row [r] in the
+table with rows [rowlist] is of the same type as the corresponding entry in the
+first row in the [rowlist]. *)
 Definition row_validity_2_3_table (r : row) (rowlist : list row) :=
   match rowlist with
   | [] => true
   | first_row::row_tail => row_validity_2_3_bool first_row r
   end.
 
+(** [header_matches_first_row] checks that the header [h] in the table
+with rows [rowlist] has the same number of entries as row [r]. *)
 Definition header_matches_first_row (h : header) (r : row) (rowlist : list row) :=
   match rowlist with
   | [] => List.length h =? List.length r
   | _ => true
   end.
 
+(** [add_row] adds row [r] to table [tbl] and returns the resulting table.
+Checks validity of [r] and of the resulting table. *)
 Definition add_row (r : row) (tbl : table) :=
   match tbl with
     | (_, []) => tbl
@@ -98,6 +118,7 @@ Definition add_row (r : row) (tbl : table) :=
       then ((r::t, ident)) else ((t, ident))
     end.
 
+(** [entry_eqb] is the equality of entry [e1] and [e2]. *)
 Definition entry_eqb (e1: entry) (e2: entry) :=
   match e1, e2 with
   | string_entry s1, string_entry s2 => if (string_dec s1 s2) then true else false
@@ -105,13 +126,16 @@ Definition entry_eqb (e1: entry) (e2: entry) :=
   | _, _ => false
   end.
 
+(** [row_eqb] is the equality of row [r1] and [r2]. Checks that every entry in
+[r1] and is equal to every respective entry in [r2]. *)
 Fixpoint row_eqb (r1: row) (r2: row) :=
   match r1, r2 with
   | [], [] => true
   | e1::tl1, e2::tl2 => andb (entry_eqb e1 e2) (row_eqb tl1 tl2)
   | _, _ => false
   end.
-  
+
+(** [remove_first_row_from_row_list r row_list] is row_list with the first row that is equal to r from [row_list] removed **)
 Fixpoint remove_first_row_from_row_list (r: row) (row_list : list row) :=
   match row_list with
   | [] => []
@@ -120,38 +144,50 @@ Fixpoint remove_first_row_from_row_list (r: row) (row_list : list row) :=
                                                                  row_list_tl)
   end.
 
+(** [remove_all_row_from_row_list r row_list] is a rowlist with all the rows that are equal to r from [row_list] removed **)
 Fixpoint remove_all_row_from_row_list (r : row) (row_list : list row) :=
   filter (fun rw => negb (row_eqb rw r)) row_list.
 
+(** [remove_all_row_from_table r tbl] is a Table with all the rows that are equal to r from [tbl] removed **)
 Definition remove_all_row_from_table (r : row) (tbl : table) :=
   match tbl with
   | (row_list, hdr) => ((remove_all_row_from_row_list r row_list), hdr)  
   end.
 
+(** [remove_first_row_from_table r tbl] is a Table with the first row that is equal to r from [tbl] removed **)
 Definition remove_first_row_from_table (r : row) (tbl : table) :=
   match tbl with
   | (row_list, hdr) => ((remove_first_row_from_row_list r row_list), hdr)
   end.
 
-(** TODO: redifine in terms of fold, filter, or map **)
+(** [filter_row_by_entry f hdr h r] gives true if, for the element e matching the header identifier hdr, [f e = true], otherwise it gives false
+    f is the filter function  **)
 Fixpoint filter_row_by_entry (f: entry -> bool) (hdr: string) (h: header) (r: row) : bool :=
   match h, r with
   | [], [] => false
   | identifier::t, ent::row_tail => if (string_dec hdr identifier) then (f ent) else (filter_row_by_entry f hdr t row_tail)
   | _, _ => false (** some sort of error with h and r **)
   end.
-
+(** [filter_table_by_entry helper f hdr t h] is a helper for filter_table_by_entry. It has the same semantics but takes 
+list rows and headers and gives a [list row] instead of a Table **)
 Fixpoint filter_table_by_entry_helper (f: entry -> bool) (hdr: string) (t: list row) (h: header) : list row :=
   match t with
   | [] => []
   | r::tl => if (filter_row_by_entry f hdr h r) then (r::(filter_table_by_entry_helper f hdr tl h)) else ((filter_table_by_entry_helper f hdr tl h)) 
-  end.                                                     
+  end.
 
+(** [filter_table_by_entry f hdr tbl] gives a tbl with rows only such that [f e = true] and e is under header element [hdr]
+[filter_table_by_entry (fun e => string_eqb e "Haram") "Name" tbl] will return a table from the rows of [tbl] where the "Name" is Haram provided "Name" is 
+an element of the header and "Haram" is under the correct "Name" header 
+
+  As demonstrated by the example [f] is the filter function **) 
 Fixpoint filter_table_by_entry (f: entry -> bool) (hdr : string) (tbl : table) : table :=
   match tbl with
   | (t, h) => ((filter_table_by_entry_helper f hdr t h), h)
   end.
 
+(** Evidence for table_valid_1 tbl can be given in 3 ways. Constructor same_length requires that the header and the table have the same length.
+ Constructor empty_header_valid requires the header to be empty and the rowlist to be empty. Constructor empty_rowlist_valid requires the rowlist to be empty *)  
 Inductive table_valid_1 (tbl : table) : Prop :=
 | same_length (h : header) (fst_row : list entry) (rowlist : list row) :
     get_header tbl = h -> get_rowlist tbl = rowlist -> List.length h = List.length fst_row ->  (exists tl, rowlist = fst_row::tl) -> table_valid_1 tbl
@@ -160,7 +196,8 @@ Inductive table_valid_1 (tbl : table) : Prop :=
 | empty_rowlist_valid (rowlist : list row) : 
 	get_rowlist tbl = rowlist -> rowlist = [] -> table_valid_1 tbl.
 
-
+(** all_rows_same_length rowlist is True iff all the rows in the rowlist are the same length. Empty rowlists and rowlists of only one row are True under
+all_rows_same_length **)
 Fixpoint all_rows_same_length (rowlist: list row) : Prop :=
   match rowlist with
   | [] => True
@@ -172,10 +209,12 @@ Fixpoint all_rows_same_length (rowlist: list row) : Prop :=
               end
   end.
 
+(** table_valid_2 tbl is True iff all the rows in the rowlist of tbl are the same length **)
 Inductive table_valid_2 (tbl : table) : Prop :=
 | rows_same_length (rowlist : list row) :
     get_rowlist tbl = rowlist -> all_rows_same_length (rowlist) -> table_valid_2 tbl.
 
+(** all_cols_same_type rowlist is True iff all cols in the rowlist have the same type, empty rowlists and rowlists are True under all_cols_same_type **)
 Fixpoint all_cols_same_type (rowlist : list row) : Prop :=
   match rowlist with
   | [] => True
@@ -186,12 +225,19 @@ Fixpoint all_cols_same_type (rowlist : list row) : Prop :=
               end
   end.
 
+(** table_valid_3 tbl is True iff all the cols in the rowlist have the same type**)
 Inductive table_valid_3 (tbl : table) : Prop :=
 | cols_same_type (rowlist : list row) : get_rowlist tbl = rowlist -> all_cols_same_type (rowlist) -> table_valid_3 tbl.
-                                                                                           
+
+(** table_valid tbl is True iff table_valid_1 tbl, tbl_valid_2 tbl, and tbl_valid_3 tbl **)
 Inductive table_valid (tbl : table) : Prop :=
 | valid_1_2_3 : table_valid_1 tbl -> table_valid_2 tbl -> table_valid_3 tbl ->
                 table_valid tbl.
+
+
+
+
+
 
 (** Unit tests with definitions so far **)
 Let test_tbl :=
@@ -279,7 +325,22 @@ Proof.
   - apply H.
   - apply H.
   - destruct a eqn:Hrowlist.
-    -- simpl in Heq. discriminate. 
+    -- simpl in Heq. discriminate.
+    -- simpl in Hrow_valid. destruct r eqn:Hr.
+    * destruct H. destruct H; subst. simpl in H3. destruct H4. simpl in H. injection H.
+      intros H_l_x. intros H_fst_row. subst. simpl in H3. discriminate.
+      simpl in H3. discriminate. simpl in H2.  discriminate H2.
+    * simpl in Hrow_valid. discriminate.
+      +++ simpl. destruct b eqn:Hheader; apply H.
+      ++ simpl. destruct b eqn:Hb; apply H.
+    + intros tbl. intros H. induction tbl.
+      ++ destruct b.
+         +++ simpl. apply H.
+         +++ simpl. destruct (header_matches_first_row (s :: b) (a :: r) a0) eqn:Hhead.
+             destruct (row_validity_2_3_table (a::r) a0) eqn:Hrow_valid.
+  - simpl. apply valid_1_2_3.
+    -- apply same_length with (h:=s::b) (fst_row:=(a::r)) (rowlist:=(a::r)::a0); try(reflexivity).
+    * 
   - apply valid_1_2_3.
     * apply empty_header_valid with (rowlist:=[[]]) (h:=[]); try (reflexivity).
       ** simpl. reflexivity.
