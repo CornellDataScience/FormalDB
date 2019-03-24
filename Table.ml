@@ -16,6 +16,14 @@ type nat =
   | O
   | S of nat
 
+let int_to_nat (z : int) =
+  if z<= 0 then O else (S (int_to_nat (z-1)))
+
+let nat_to_int (n : nat) =
+ match nat with 
+ | O -> 0
+ | S n -> 1 + (nat_to_int n)
+
 type ('a, 'b) prod =
   | Pair of 'a * 'b
 
@@ -44,6 +52,16 @@ let bool_dec b1 b2 =
       | True -> Right
       | False -> Left)
 
+let sumbool_to_bool (g : sumbool) =
+  match g with 
+  | Left -> True
+  | Right -> False
+
+let bool_to_sumbool (b: bool) = 
+  match b with 
+  | True -> Left
+  | False -> Right
+  
 module Nat =
 struct
   (** val eqb : nat -> nat -> bool **)
