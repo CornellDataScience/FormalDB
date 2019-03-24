@@ -13,7 +13,6 @@ Inductive entry :=
     | nat_entry (n : nat)
     | nil_entry.
 
-
 Definition row : Type :=
     list entry.
 
@@ -23,11 +22,13 @@ Definition header : Type :=
 Definition table : Type :=
   (list row) * (header).
 
+(** [get_rowlist] is the list of rows from table [tbl] *)
 Definition get_rowlist (tbl : table) :=
   match tbl with
   | (rowlist, _) => rowlist
   end.
 
+(** [get_header] is the header of table [tbl] *)
 Definition get_header (tbl: table) :=
   match tbl with
   | (_, h) => h
@@ -39,6 +40,8 @@ Check row.
 Definition empty_table : table 
     := (@nil (row), nil).
 
+(** [add_header] adds header [h] to table [tbl] if [tbl] is empty.
+Returns old table if [tbl] is not empty. *)
 Definition add_header (h : header) (tbl: table) :=
   match tbl with
   | (rowlist, old_h) => match rowlist with
@@ -46,6 +49,8 @@ Definition add_header (h : header) (tbl: table) :=
                         | _ => (rowlist, old_h)
                         end
   end.
+
+(** [entry_type_match] checks if entries [e1] and [e2] are of the same type *)
 Definition entry_type_match (e1 : entry) (e2: entry) :=
   match e1, e2 with
   | string_entry _, string_entry _ => true
@@ -55,6 +60,8 @@ Definition entry_type_match (e1 : entry) (e2: entry) :=
   | _, _ => false
   end.
 
+(** [entry_type_match_prop] checks is entries [e1] and [e2] are of the same
+type for propositions *)
 Definition entry_type_match_prop (e1 : entry) (e2: entry) :=
   match e1, e2 with
   | string_entry _, string_entry _ => True
@@ -64,6 +71,9 @@ Definition entry_type_match_prop (e1 : entry) (e2: entry) :=
   | _, _ => False
   end.
 
+(** [row_validity_2_3_bool] takes in row [r1] and [r2] and checks
+if the entry in a row is the same as the entry in the row before it
+at the same index *)
 Fixpoint row_validity_2_3_bool (r1 : row) (r2: row) :=
   match r1, r2 with
   | [],[] => true
@@ -71,6 +81,9 @@ Fixpoint row_validity_2_3_bool (r1 : row) (r2: row) :=
   | _, _ => false
   end.
 
+(** [row_validity_2_3_bool] takes in row [r1] and [r2] and checks
+if the entry in a row is the same as the entry in the row before it
+at the same index for propositions *)
 Fixpoint row_validity_2_3 (r1 : row) (r2: row) :=
   match r1, r2 with
   | [],[] => True
@@ -78,18 +91,25 @@ Fixpoint row_validity_2_3 (r1 : row) (r2: row) :=
   | _, _ => False
   end.
 
+(** [row_validity_2_3_table] checks that every entry in row [r] in the
+table with rows [rowlist] is of the same type as the corresponding entry in the
+first row in the [rowlist]. *)
 Definition row_validity_2_3_table (r : row) (rowlist : list row) :=
   match rowlist with
   | [] => true
   | first_row::row_tail => row_validity_2_3_bool first_row r
   end.
 
+(** [header_matches_first_row] checks that the header [h] in the table
+with rows [rowlist] has the same number of entries as row [r]. *)
 Definition header_matches_first_row (h : header) (r : row) (rowlist : list row) :=
   match rowlist with
   | [] => List.length h =? List.length r
   | _ => true
   end.
 
+(** [add_row] adds row [r] to table [tbl] and returns the resulting table.
+Checks validity of [r] and of the resulting table. *)
 Definition add_row (r : row) (tbl : table) :=
   match tbl with
     | (_, []) => tbl
@@ -98,6 +118,7 @@ Definition add_row (r : row) (tbl : table) :=
       then ((r::t, ident)) else ((t, ident))
     end.
 
+(** [entry_eqb] is the equality of entry [e1] and [e2]. *)
 Definition entry_eqb (e1: entry) (e2: entry) :=
   match e1, e2 with
   | string_entry s1, string_entry s2 => if (string_dec s1 s2) then true else false
@@ -105,6 +126,8 @@ Definition entry_eqb (e1: entry) (e2: entry) :=
   | _, _ => false
   end.
 
+(** [row_eqb] is the equality of row [r1] and [r2]. Checks that every entry in
+[r1] and is equal to every respective entry in [r2]. *)
 Fixpoint row_eqb (r1: row) (r2: row) :=
   match r1, r2 with
   | [], [] => true
