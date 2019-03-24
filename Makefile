@@ -1,5 +1,7 @@
 MODULES=Table
+CSV_MODULES=csv_table
 OBJECTS=$(MODULES:=.cmo)
+CSV_OBJECTS=$(CSV_MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)
 TEST=test.byte
@@ -14,7 +16,7 @@ PKGS2=csv
 default: build
 	utop
 table-csv:
-	$(OCAMLBUILD2) $(OBJECTS) $(MAIN_CSV)
+	ocamlbuild -use-ocamlfind -pkgs csv csv_table.cmo csv_table.byte
 build: 
 	$(OCAMLBUILD) $(OBJECTS) $(MAIN)
 test:
