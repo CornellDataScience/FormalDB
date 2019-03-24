@@ -279,7 +279,22 @@ Proof.
   - apply H.
   - apply H.
   - destruct a eqn:Hrowlist.
-    -- simpl in Heq. discriminate. 
+    -- simpl in Heq. discriminate.
+    -- simpl in Hrow_valid. destruct r eqn:Hr.
+    * destruct H. destruct H; subst. simpl in H3. destruct H4. simpl in H. injection H.
+      intros H_l_x. intros H_fst_row. subst. simpl in H3. discriminate.
+      simpl in H3. discriminate. simpl in H2.  discriminate H2.
+    * simpl in Hrow_valid. discriminate.
+      +++ simpl. destruct b eqn:Hheader; apply H.
+      ++ simpl. destruct b eqn:Hb; apply H.
+    + intros tbl. intros H. induction tbl.
+      ++ destruct b.
+         +++ simpl. apply H.
+         +++ simpl. destruct (header_matches_first_row (s :: b) (a :: r) a0) eqn:Hhead.
+             destruct (row_validity_2_3_table (a::r) a0) eqn:Hrow_valid.
+  - simpl. apply valid_1_2_3.
+    -- apply same_length with (h:=s::b) (fst_row:=(a::r)) (rowlist:=(a::r)::a0); try(reflexivity).
+    * 
   - apply valid_1_2_3.
     * apply empty_header_valid with (rowlist:=[[]]) (h:=[]); try (reflexivity).
       ** simpl. reflexivity.
