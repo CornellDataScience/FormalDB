@@ -14,7 +14,11 @@ val filter : ('a1 -> bool) -> 'a1 list -> 'a1 list
 
 val string_dec : char list -> char list -> bool
 
+<<<<<<< HEAD
 module Table2 :
+=======
+module Table :
+>>>>>>> e956f51b401ceb032558694cf8275c14ffa06eae
  sig
   val string_eq : char list -> char list -> bool
 
@@ -74,9 +78,19 @@ module Table2 :
 
   val table_valid_rec : table -> (__ -> __ -> __ -> 'a1) -> 'a1
 
+<<<<<<< HEAD
   val entry_is_haram : entry -> bool
 
   val entry_is_string : char list -> entry -> bool
 
   val print_table : table -> unit
+=======
+  val test_tbl : row list * header
+
+  val test_tbl_1 : table
+
+  val entry_is_haram : entry -> bool
+
+  val entry_is_string : char list -> entry -> bool
+>>>>>>> e956f51b401ceb032558694cf8275c14ffa06eae
  end

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "Rule: ocaml dependencies ml (%=Table )": "=\224w\1453\226\029\226\201A\219\187~8\224\144"
 "Resource: /home/serverteam_1/formal_db/Table2.mli": "\202\232,\133\202'\029|}2\218\t\146\152\255\204"
 "Resource: /home/serverteam_1/formal_db/Table.ml": "\182\230r\223=\144\253\211!f8\135\234\2270="
@@ -12,3 +13,9 @@
 "Rule: ocaml: ml -> cmo & cmi (%=Table )": "%+\250]\015pd\167\232\200\176\139\247\165\220\185"
 "Rule: ocaml: ml & cmi -> cmo (%=Table2 )": "Y\195.\135B\239\175\018*\030\016\150\250t+\204"
 "Rule: ocaml: cmo* -> byte (%=Table )": "\145\186Q\252\13712\188\239k8\169F\215\028\249"
+=======
+"Resource: /home/abhinav/Desktop/formaldb/FormalDB/Table2.ml": "[\159\015\218\028J\187\245\233{4;5\134\196\197"
+"Rule: ocaml: mli -> cmi (%=Table2 )": ")\223\231\153\138\240R\141q\247\152\029/\130@\149"
+"Rule: ocaml dependencies mli (%=Table2 )": "\163\202\027\159\2048\132\252\202(:\006\141\140\176@"
+"Resource: /home/abhinav/Desktop/formaldb/FormalDB/Table2.mli": "\212\208vp+uah\223\200fQ\021\167\2207"
+>>>>>>> e956f51b401ceb032558694cf8275c14ffa06eae
