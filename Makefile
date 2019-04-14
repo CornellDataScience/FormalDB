@@ -1,4 +1,4 @@
-MODULES=Table
+MODULES=Table Table2
 CSV_MODULES=csv_table
 OBJECTS=$(MODULES:=.cmo)
 CSV_OBJECTS=$(CSV_MODULES:=.cmo)
