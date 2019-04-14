@@ -2,6 +2,8 @@ Require Import List Arith Bool Ascii String.
 Require String.
 Import ListNotations.
 From Coq Require Extraction.
+Require Import ExtrOcamlBasic.
+Require Import ExtrOcamlString.
 Module Table.
 Open Scope string_scope.
 
@@ -423,3 +425,13 @@ Proof.
     -- simpl. rewrite Heq.
 Abort.
 End Table.
+
+Extract Inductive bool ⇒ "bool" [ "true" "false" ].
+Extract Inductive nat ⇒ "int"
+  [ "0" "(fun x → x + 1)" ]
+  "(fun zero succ n →
+      if n=0 then zero () else succ (n-1))".
+Extract Constant plus ⇒ "( + )".
+Extract Constant mult ⇒ "( * )".
+Extract Constant eqb ⇒ "( = )".
+Extraction "Table2.ml" Table.
