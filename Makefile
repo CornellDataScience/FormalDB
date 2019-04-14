@@ -1,4 +1,4 @@
-MODULES=Table Table2
+MODULES=Table Table2 Csv_conv
 CSV_MODULES=csv_table
 OBJECTS=$(MODULES:=.cmo)
 CSV_OBJECTS=$(CSV_MODULES:=.cmo)
@@ -17,6 +17,8 @@ default: build
 	utop
 table-csv:
 	ocamlbuild -use-ocamlfind -pkgs csv csv_table.cmo csv_table.byte
+load-csv:
+	ocamlbuild -use-ocamlfind -pkgs csv load_csv.cmo load_csv.byte
 build:
 	$(OCAMLBUILD) $(OBJECTS) $(MAIN)
 test:

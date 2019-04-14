@@ -1,41 +1,24 @@
 ### Starting build.
-<<<<<<< HEAD
 # Target: csv_table.ml.depends, tags: { package(csv), package(unix), extension:ml, file:csv_table.ml, ocaml, ocamldep, quiet, traverse }
 ocamlfind ocamldep -package unix -package csv -modules csv_table.ml > csv_table.ml.depends
+# Target: Csv_conv.mli.depends, tags: { package(csv), package(unix), extension:mli, file:Csv_conv.mli, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package unix -package csv -modules Csv_conv.mli > Csv_conv.mli.depends # cached
 # Target: Table2.mli.depends, tags: { package(csv), package(unix), extension:mli, file:Table2.mli, ocaml, ocamldep, quiet, traverse }
 ocamlfind ocamldep -package unix -package csv -modules Table2.mli > Table2.mli.depends # cached
 # Target: Table2.cmi, tags: { package(csv), package(unix), byte, compile, extension:mli, file:Table2.mli, interf, ocaml, quiet, traverse }
 ocamlfind ocamlc -c -package unix -package csv -o Table2.cmi Table2.mli # cached
+# Target: Csv_conv.cmi, tags: { package(csv), package(unix), byte, compile, extension:mli, file:Csv_conv.mli, interf, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package unix -package csv -o Csv_conv.cmi Csv_conv.mli # cached
 # Target: csv_table.cmo, tags: { package(csv), package(unix), byte, compile, extension:cmo, extension:ml, file:csv_table.cmo, file:csv_table.ml, implem, ocaml, quiet, traverse }
 ocamlfind ocamlc -c -package unix -package csv -o csv_table.cmo csv_table.ml
-+ ocamlfind ocamlc -c -package unix -package csv -o csv_table.cmo csv_table.ml
-File "csv_table.ml", line 20, characters 12-25:
-Warning 3: deprecated: String.create
-Use Bytes.create instead.
-File "csv_table.ml", line 23, characters 14-26:
-Warning 3: deprecated: String.set
-Use Bytes.set instead.
-File "csv_table.ml", line 39, characters 8-25:
-Warning 10: this expression should have type unit.
+# Target: Csv_conv.ml.depends, tags: { package(csv), package(unix), extension:ml, file:Csv_conv.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package unix -package csv -modules Csv_conv.ml > Csv_conv.ml.depends # cached
+# Target: Csv_conv.cmo, tags: { package(csv), package(unix), byte, compile, extension:cmo, extension:ml, file:Csv_conv.cmo, file:Csv_conv.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package unix -package csv -o Csv_conv.cmo Csv_conv.ml # cached
 # Target: Table2.ml.depends, tags: { package(csv), package(unix), extension:ml, file:Table2.ml, ocaml, ocamldep, quiet, traverse }
 ocamlfind ocamldep -package unix -package csv -modules Table2.ml > Table2.ml.depends # cached
 # Target: Table2.cmo, tags: { package(csv), package(unix), byte, compile, extension:cmo, extension:ml, file:Table2.cmo, file:Table2.ml, implem, ocaml, quiet, traverse }
 ocamlfind ocamlc -c -package unix -package csv -o Table2.cmo Table2.ml # cached
 # Target: csv_table.byte, tags: { package(csv), package(unix), byte, dont_link_with, extension:byte, file:csv_table.byte, link, ocaml, program, quiet, traverse }
-ocamlfind ocamlc -linkpkg -package unix -package csv Table2.cmo csv_table.cmo -o csv_table.byte
+ocamlfind ocamlc -linkpkg -package unix -package csv Table2.cmo Csv_conv.cmo csv_table.cmo -o csv_table.byte
 # Compilation successful.
-=======
-# Target: Table2.mli.depends, tags: { package(csv), package(unix), extension:mli, file:Table2.mli, ocaml, ocamldep, quiet, traverse }
-ocamlfind ocamldep -package unix -package csv -modules Table2.mli > Table2.mli.depends
-# Target: Table2.cmi, tags: { package(csv), package(unix), byte, compile, extension:mli, file:Table2.mli, interf, ocaml, quiet, traverse }
-ocamlfind ocamlc -c -package unix -package csv -o Table2.cmi Table2.mli
-# Target: Table2.ml.depends, tags: { package(csv), package(unix), extension:ml, file:Table2.ml, ocaml, ocamldep, quiet, traverse }
-ocamlfind ocamldep -package unix -package csv -modules Table2.ml > Table2.ml.depends
-+ ocamlfind ocamldep -package unix -package csv -modules Table2.ml > Table2.ml.depends
-File "Table2.ml", line 15, characters 20-21:
-Warning 3: deprecated: ISO-Latin1 characters in identifiers
-File "Table2.ml", line 15, characters 21-22:
-Error: Illegal character (\134)
-Command exited with code 2.
-# Compilation unsuccessful.
->>>>>>> e956f51b401ceb032558694cf8275c14ffa06eae

@@ -12,35 +12,21 @@ let negb = function
 
 let rec length = function
 | [] -> 0
-<<<<<<< HEAD
 | _ :: l' -> (fun x -> x + 1) (length l')
-=======
-| _ :: l' -> (fun x → x + 1) (length l')
->>>>>>> e956f51b401ceb032558694cf8275c14ffa06eae
 
 module Nat =
  struct
   (** val eqb : int -> int -> bool **)
 
   let rec eqb n m =
-<<<<<<< HEAD
     (fun zero succ n ->       if n=0 then zero () else succ (n-1))
       (fun _ ->
       (fun zero succ n ->       if n=0 then zero () else succ (n-1))
-=======
-    (fun zero succ n →       if n=0 then zero () else succ (n-1))
-      (fun _ ->
-      (fun zero succ n →       if n=0 then zero () else succ (n-1))
->>>>>>> e956f51b401ceb032558694cf8275c14ffa06eae
         (fun _ -> true)
         (fun _ -> false)
         m)
       (fun n' ->
-<<<<<<< HEAD
       (fun zero succ n ->       if n=0 then zero () else succ (n-1))
-=======
-      (fun zero succ n →       if n=0 then zero () else succ (n-1))
->>>>>>> e956f51b401ceb032558694cf8275c14ffa06eae
         (fun _ -> false)
         (fun m' -> eqb n' m')
         m)
@@ -65,7 +51,6 @@ let rec string_dec s x =
      | [] -> false
      | a0::s1 -> if (=) a a0 then string_dec s0 s1 else false)
 
-<<<<<<< HEAD
 let implode l =
   let res = String.create (List.length l) in
   let rec imp i = function
@@ -74,9 +59,6 @@ let implode l =
   imp 0 l
 
 module Table2 =
-=======
-module Table =
->>>>>>> e956f51b401ceb032558694cf8275c14ffa06eae
  struct
   (** val string_eq : char list -> char list -> bool **)
 
@@ -262,7 +244,6 @@ module Table =
   let table_valid_rec _ f =
     f __ __ __
 
-<<<<<<< HEAD
   let rec print_header h = 
   match h with 
   | [] -> ()
@@ -288,8 +269,6 @@ module Table =
     print_header hdr; print_string "\n";
     print_rowlist rowlist
 
-=======
->>>>>>> e956f51b401ceb032558694cf8275c14ffa06eae
   (** val test_tbl : row list * header **)
 
   let test_tbl =
