@@ -1,4 +1,4 @@
-MODULES=Table
+MODULES=Table2
 CSV_MODULES=csv_table
 OBJECTS=$(MODULES:=.cmo)
 CSV_OBJECTS=$(CSV_MODULES:=.cmo)
@@ -7,7 +7,7 @@ MLIS=$(MODULES:=.mli)
 TEST=test.byte
 TEST_CMD=test_commands.byte
 TEST_DIFF=diff_tester.byte
-MAIN=Table.byte
+MAIN=Table2.byte
 MAIN_CSV=csv_table.byte
 OCAMLBUILD=ocamlbuild -use-ocamlfind -pkgs $(PKGS)
 OCAMLBUILD2=ocamlbuild -use-ocamlfind -pkgs $(PKGS2)
@@ -17,7 +17,7 @@ default: build
 	utop
 table-csv:
 	ocamlbuild -use-ocamlfind -pkgs csv csv_table.cmo csv_table.byte
-build: 
+build:
 	$(OCAMLBUILD) $(OBJECTS) $(MAIN)
 test:
 	$(OCAMLBUILD) -tag debug $(TEST) && ./$(TEST)
@@ -26,7 +26,7 @@ test-diff:
 test-cmd:
 	$(OCAMLBUILD) -tag debug $(TEST_CMD) && ./$(TEST_CMD)
 docs: docs-public docs-private
-	
+
 docs-public: build
 	mkdir -p doc.public
 	ocamlfind ocamldoc -I _build -package $(PKGS) \

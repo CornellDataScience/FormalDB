@@ -1,4 +1,4 @@
-open Table
+open Table2
 open Csv
 
 let csv_lst = Csv.load "Example.csv"

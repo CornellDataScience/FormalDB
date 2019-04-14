@@ -1,12 +1,14 @@
 ### Starting build.
-# Target: csv_table.ml.depends, tags: { package(csv), package(unix), extension:ml, file:csv_table.ml, ocaml, ocamldep, quiet, traverse }
-ocamlfind ocamldep -package unix -package csv -modules csv_table.ml > csv_table.ml.depends
-# Target: Table.ml.depends, tags: { package(csv), package(unix), extension:ml, file:Table.ml, ocaml, ocamldep, quiet, traverse }
-ocamlfind ocamldep -package unix -package csv -modules Table.ml > Table.ml.depends
-# Target: Table.cmo, tags: { package(csv), package(unix), byte, compile, extension:cmo, extension:ml, file:Table.cmo, file:Table.ml, implem, ocaml, quiet, traverse }
-ocamlfind ocamlc -c -package unix -package csv -o Table.cmo Table.ml
-# Target: csv_table.cmo, tags: { package(csv), package(unix), byte, compile, extension:cmo, extension:ml, file:csv_table.cmo, file:csv_table.ml, implem, ocaml, quiet, traverse }
-ocamlfind ocamlc -c -package unix -package csv -o csv_table.cmo csv_table.ml
-# Target: csv_table.byte, tags: { package(csv), package(unix), byte, dont_link_with, extension:byte, file:csv_table.byte, link, ocaml, program, quiet, traverse }
-ocamlfind ocamlc -linkpkg -package unix -package csv Table.cmo csv_table.cmo -o csv_table.byte
-# Compilation successful.
+# Target: Table2.mli.depends, tags: { package(csv), package(unix), extension:mli, file:Table2.mli, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package unix -package csv -modules Table2.mli > Table2.mli.depends
+# Target: Table2.cmi, tags: { package(csv), package(unix), byte, compile, extension:mli, file:Table2.mli, interf, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package unix -package csv -o Table2.cmi Table2.mli
+# Target: Table2.ml.depends, tags: { package(csv), package(unix), extension:ml, file:Table2.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package unix -package csv -modules Table2.ml > Table2.ml.depends
++ ocamlfind ocamldep -package unix -package csv -modules Table2.ml > Table2.ml.depends
+File "Table2.ml", line 15, characters 20-21:
+Warning 3: deprecated: ISO-Latin1 characters in identifiers
+File "Table2.ml", line 15, characters 21-22:
+Error: Illegal character (\134)
+Command exited with code 2.
+# Compilation unsuccessful.
