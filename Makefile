@@ -1,5 +1,7 @@
 MODULES=Table
+CSV_MODULES=csv_table
 OBJECTS=$(MODULES:=.cmo)
+CSV_OBJECTS=$(CSV_MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)
 TEST=test.byte
@@ -14,7 +16,7 @@ PKGS2=csv
 default: build
 	utop
 table-csv:
-	$(OCAMLBUILD2) $(OBJECTS) $(MAIN_CSV)
+	ocamlbuild -use-ocamlfind -pkgs csv csv_table.cmo csv_table.byte
 build: 
 	$(OCAMLBUILD) $(OBJECTS) $(MAIN)
 test:
@@ -40,5 +42,7 @@ clean:
 	rm -rf doc.public doc.private .git-ml search_src.zip
 zip:
 	zip git-ml_src.zip *.ml* _tags git-ml test_routine Makefile
+production:
+	node formal_db_server.js & echo "$$!" > server_pid.txt
 
 rebuild: clean build
