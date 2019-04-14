@@ -320,8 +320,8 @@ module Table =
   (** val entry_is_string : string -> entry -> bool **)
 
   let entry_is_string s = function
-  | Coq_string_entry s_e -> (match string_dec s_e s with
-                             | Left -> True
-                             | Right -> False)
-  | _ -> False
- end
+    | Coq_string_entry s_e -> (match string_dec s_e s with
+        | Left -> True
+        | Right -> False)
+    | _ -> False
+end

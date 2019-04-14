@@ -1,4 +1,0 @@
-"Rule: ocaml dependencies ml (%=Table )": "\230S3\193\149\193\202\209\155A\241\t\145\133\136\""
-"Rule: ocaml: ml -> cmo & cmi (%=Table )": "\128\160\152\017t\166\177KW\224\r\022\137#\222\232"
-"Resource: /home/abhinav/Desktop/formaldb/FormalDB/Table.ml": "*V\001\156R&z\206M$\209\158\207\183\194\152"
-"Rule: ocaml: cmo* -> byte (%=Table )": "\011\005\147/\021\155w\227\020\152\147Y\127dI "
