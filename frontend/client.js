@@ -44,7 +44,7 @@ function parse_command (command) {
     else {
             var data = {cmd: command};
             $.ajax({
-                url: "http://192.168.1.11:3110/command",
+                url: window.location.hostname + ":" + window.location.port +  "/command",
                 type: "POST",
                 data: data,
                 success: function (r) {console.log("Sent command " + command)},
