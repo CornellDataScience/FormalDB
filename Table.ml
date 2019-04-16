@@ -16,10 +16,10 @@ type nat =
 | O
 | S of nat
 
-let int_to_nat (z : int) =
+let rec int_to_nat (z : int) =
   if z<= 0 then O else (S (int_to_nat (z-1)))
 
-let nat_to_int (n : nat) =
+let rec nat_to_int (n : nat) =
  match nat with 
  | O -> 0
  | S n -> 1 + (nat_to_int n)

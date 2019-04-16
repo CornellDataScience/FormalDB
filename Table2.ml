@@ -12,21 +12,21 @@ let negb = function
 
 let rec length = function
 | [] -> 0
-| _ :: l' -> (fun x → x + 1) (length l')
+| _ :: l' -> (fun x -> x + 1) (length l')
 
 module Nat =
  struct
   (** val eqb : int -> int -> bool **)
 
   let rec eqb n m =
-    (fun zero succ n →       if n=0 then zero () else succ (n-1))
+    (fun zero succ n ->       if n=0 then zero () else succ (n-1))
       (fun _ ->
-      (fun zero succ n →       if n=0 then zero () else succ (n-1))
+      (fun zero succ n ->       if n=0 then zero () else succ (n-1))
         (fun _ -> true)
         (fun _ -> false)
         m)
       (fun n' ->
-      (fun zero succ n →       if n=0 then zero () else succ (n-1))
+      (fun zero succ n ->       if n=0 then zero () else succ (n-1))
         (fun _ -> false)
         (fun m' -> eqb n' m')
         m)
@@ -51,7 +51,14 @@ let rec string_dec s x =
      | [] -> false
      | a0::s1 -> if (=) a a0 then string_dec s0 s1 else false)
 
-module Table =
+let implode l =
+  let res = String.create (List.length l) in
+  let rec imp i = function
+  | [] -> res
+  | c :: l -> res.[i] <- c; imp (i + 1) l in
+  imp 0 l
+
+module Table2 =
  struct
   (** val string_eq : char list -> char list -> bool **)
 
@@ -236,6 +243,29 @@ module Table =
 
   let table_valid_rec _ f =
     f __ __ __
+
+  let rec print_header h = 
+  match h with 
+  | [] -> ()
+  | head::t -> print_string (implode(head) ^ "\t"); print_header t
+
+  let rec print_row r =
+  match r with 
+  | [] -> ()
+  | h::t -> match h with 
+            | Coq_nat_entry n -> print_int n; print_string "\t"
+            | Coq_nil_entry -> print_string ("[NULL_ENTRY]" ^ "\t")
+            | Coq_string_entry s -> print_string (implode(s) ^ "\t")
+
+  let rec print_table tbl = 
+    let (rowlist, h) = tbl in 
+    print_header h; print_string "\n";
+    let rec print_rowlist rwlst = 
+      match print_rowlist with 
+      | [] -> ()
+      | head::t -> print_row head; print_string "\n"; print_rowlist t
+    in print_rowlist rowlist
+
 
   (** val test_tbl : row list * header **)
 
