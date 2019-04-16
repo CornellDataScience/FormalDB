@@ -39,11 +39,11 @@
         <nav class="navbar navbar-light bg-white topbar mb-4 static-top shadow">
 
           <!-- Topbar Search -->
+          <iframe id="invisible" name="invisible" style="display:none;"></iframe>
           <form action="/upload" enctype="multipart/form-data" method="POST" id="upload">
               <div class="form-group">
                 <label for="csv_upload">Upload CSV</label>
                 <input type="file" class="form-control-file" id="csv_file" name="csv_file">
-                <input type="submit" value="Upload CSV" />
               </div>
             </form>
           <form class="d-none d-sm-inline-block form-inline mx-auto navbar-search rounded form-control-lg">
@@ -58,7 +58,9 @@
         <!-- Begin Page Content -->
         <div class="container-fluid">
 
-          
+          <div id="output-div">
+            <span id="output"></span>
+          </div>
 
           
 

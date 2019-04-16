@@ -35,10 +35,14 @@ app.use('/scss', express.static("./scss"))
 app.use('/img', express.static("./img"))
 app.use(express.urlencoded({ extended: false }));
 
+var expressWs = require('express-ws')(app);
 
+var _stdout = "";
 /* ==================================== */
 /* ===== Section 3: Making Routes ===== */
 /* ==================================== */
+
+
 
 router.use(function (req,res,next) {
     console.log("/" + req.method);
@@ -53,6 +57,23 @@ router.get("/client.js", function(req, res){
     res.sendFile(path + "/client.js")
 });
 
+router.ws('/echo', function(ws, req){
+    ws.on('message', function(msg) {
+        ws.send("received a message")
+    });
+});
+
+router.ws('/stdout', function(ws, req){
+    ws.on('message', function(msg) {
+        if (msg == "request stdout"){
+            if (_stdout != ""){
+                ws.send(_stdout);
+                _stdout = "";
+            }
+        }
+    });
+});
+
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, './uploads')
@@ -62,25 +83,38 @@ var storage = multer.diskStorage({
     }
 });
 
+
+
 upload = multer({ storage: storage })
+
+app.post('/command', (req, res) => {
+    console.log("recieved a command")
+    console.log(req.params)
+    res.status(204)
+    res.end()
+});
 
 app.post('/upload', upload.single('csv_file'), (req, res) => {
     if (req.file) {
         console.log('Uploading file...');
         var filename = req.file.filename;
 
-
         var uploadStatus = 'File Uploaded Successfully';
         console.log("File " + filename + " loaded.")
+
+        _stdout = "File uploaded successfully"
+        
+
     } else {
         console.log('No File Uploaded');
         var filename = 'FILE NOT UPLOADED';
         var uploadStatus = 'File Upload Failed';
+        _stdout = "File upload FAILED"
     }
     
-    /* ===== Add the function to save filename to database ===== */
+    res.status(204)
+    res.end()
     
-    //res.render("index.html")
 });
 
 
