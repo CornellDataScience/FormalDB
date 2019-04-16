@@ -38,15 +38,18 @@ window.addEventListener('load', function() {
 
 
 function parse_command (command) {
-    switch(command){
-        case "upload": document.getElementById("upload").submit();
-            break;
-        
-        default: 
-            $.post((window.location.hostname + ":" + window.location.port +  "/command"), command, function (data, status) {
-                console.log("Sent command " + command)
+    if (command == "upload"){
+        document.getElementById("upload").submit();
+    }
+    else {
+            var data = {cmd: command};
+            $.ajax({
+                url: "http://192.168.1.11:3110/command",
+                type: "POST",
+                data: data,
+                success: function (r) {console.log("Sent command " + command)},
+                error : function (r) {console.log(r)}
             });
-        break;
     }
     document.getElementById("cli").value = ""
 }

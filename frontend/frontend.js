@@ -88,10 +88,17 @@ var storage = multer.diskStorage({
 upload = multer({ storage: storage })
 
 app.post('/command', (req, res) => {
-    console.log("recieved a command")
-    console.log(req.params)
-    res.status(204)
-    res.end()
+    console.log("Processing command :" + req.body.cmd);
+    rec_cmd = req.body.cmd;
+    //default behavior
+    if (rec_cmd == "help"){
+        _stdout = "Current commands: upload";
+    }
+    else{
+        _stdout = rec_cmd + " is not a recognized command"
+    }
+    res.status(204);
+    res.end();
 });
 
 app.post('/upload', upload.single('csv_file'), (req, res) => {
