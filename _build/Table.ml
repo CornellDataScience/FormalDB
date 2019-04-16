@@ -20,11 +20,7 @@ let rec int_to_nat (z : int) =
   if z<= 0 then O else (S (int_to_nat (z-1)))
 
 let rec nat_to_int (n : nat) =
-<<<<<<< HEAD
- match nat with 
-=======
  match n with 
->>>>>>> 751a19a9540f5fd9aed47fe0cf995c20179ec072
  | O -> 0
  | S n -> 1 + (nat_to_int n)
 

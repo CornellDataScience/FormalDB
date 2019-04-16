@@ -1,0 +1,27 @@
+### Starting build.
+# Target: load_csv.ml.depends, tags: { package(csv), package(unix), extension:ml, file:load_csv.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package unix -package csv -modules load_csv.ml > load_csv.ml.depends
+# Target: Csv_conv.mli.depends, tags: { package(csv), package(unix), extension:mli, file:Csv_conv.mli, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package unix -package csv -modules Csv_conv.mli > Csv_conv.mli.depends # cached
+# Target: Table2.mli.depends, tags: { package(csv), package(unix), extension:mli, file:Table2.mli, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package unix -package csv -modules Table2.mli > Table2.mli.depends # cached
+# Target: Table2.cmi, tags: { package(csv), package(unix), byte, compile, extension:mli, file:Table2.mli, interf, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package unix -package csv -o Table2.cmi Table2.mli # cached
+# Target: Csv_conv.cmi, tags: { package(csv), package(unix), byte, compile, extension:mli, file:Csv_conv.mli, interf, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package unix -package csv -o Csv_conv.cmi Csv_conv.mli # cached
+# Target: load_csv.cmo, tags: { package(csv), package(unix), byte, compile, extension:cmo, extension:ml, file:load_csv.cmo, file:load_csv.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package unix -package csv -o load_csv.cmo load_csv.ml
++ ocamlfind ocamlc -c -package unix -package csv -o load_csv.cmo load_csv.ml
+File "load_csv.ml", line 7, characters 116-122:
+Warning 21: this statement never returns (or has an unsound type.)
+# Target: Csv_conv.ml.depends, tags: { package(csv), package(unix), extension:ml, file:Csv_conv.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package unix -package csv -modules Csv_conv.ml > Csv_conv.ml.depends # cached
+# Target: Csv_conv.cmo, tags: { package(csv), package(unix), byte, compile, extension:cmo, extension:ml, file:Csv_conv.cmo, file:Csv_conv.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package unix -package csv -o Csv_conv.cmo Csv_conv.ml # cached
+# Target: Table2.ml.depends, tags: { package(csv), package(unix), extension:ml, file:Table2.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package unix -package csv -modules Table2.ml > Table2.ml.depends # cached
+# Target: Table2.cmo, tags: { package(csv), package(unix), byte, compile, extension:cmo, extension:ml, file:Table2.cmo, file:Table2.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package unix -package csv -o Table2.cmo Table2.ml # cached
+# Target: load_csv.byte, tags: { package(csv), package(unix), byte, dont_link_with, extension:byte, file:load_csv.byte, link, ocaml, program, quiet, traverse }
+ocamlfind ocamlc -linkpkg -package unix -package csv Table2.cmo Csv_conv.cmo load_csv.cmo -o load_csv.byte
+# Compilation successful.
