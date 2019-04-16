@@ -43,8 +43,10 @@ function parse_command (command) {
     }
     else {
             var data = {cmd: command};
+            var url = window.location.hostname + ":" + window.location.port +  "/command";
+
             $.ajax({
-                url: window.location.hostname + ":" + window.location.port +  "/command",
+                url: url,
                 type: "POST",
                 data: data,
                 success: function (r) {console.log("Sent command " + command)},
