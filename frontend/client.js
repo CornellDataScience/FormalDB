@@ -41,10 +41,12 @@ function parse_command (command) {
     if (command == "upload"){
         document.getElementById("upload").submit();
     }
+    else if (command == "clear"){
+        document.getElementById("output").innerHTML = "";
+    }
     else {
             var data = {cmd: command};
-            var url = window.location.hostname + ":" + window.location.port +  "/command";
-
+            var url = "http://" + window.location.hostname + ":" + window.location.port +  "/command";
             $.ajax({
                 url: url,
                 type: "POST",

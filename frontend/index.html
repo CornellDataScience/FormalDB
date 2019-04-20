@@ -38,7 +38,7 @@
       <div id="content">
 
         <!-- Topbar -->
-        <nav class="navbar navbar-light bg-white topbar mb-4 static-top shadow">
+        <nav style="position: fixed; width:100%;" class = "navbar navbar-light bg-white topbar mb-4 static-top shadow">
 
           <!-- Topbar Search -->
           <iframe id="invisible" name="invisible" style="display:none;"></iframe>
@@ -50,7 +50,7 @@
             </form>
           <form class="d-none d-sm-inline-block form-inline mx-auto navbar-search rounded form-control-lg">
             <div class="input-group w-100">
-              <input type="text" id="cli" name="cli" class="form-control bg-light border-0" placeholder="Start typing commands" aria-label="cli" aria-describedby="basic-addon2" autofocus>
+              <input type="text" autocomplete="off" id="cli" name="cli" class="form-control bg-light border-0" placeholder="Start typing commands" aria-label="cli" aria-describedby="basic-addon2" autofocus>
             </div>
           </form>
 
@@ -58,10 +58,10 @@
         <!-- End of Topbar -->
 
         <!-- Begin Page Content -->
-        <div class="container-fluid">
+        <div style="margin-top: 4em" class="container-fluid pt-5">
 
           <div id="output-div">
-            <span id="output"></span>
+            <pre id="output"></pre>
           </div>
 
           

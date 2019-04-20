@@ -11,10 +11,11 @@ const hbs = require('hbs');
 const logger = require('morgan');
 var router = express.Router();
 var engine = require('consolidate');
+var child_p = require('child_process');
 var path = __dirname;
 
 // Define port for app to listen on
-const port =  process.env.PORT || 3110;
+const port =  process.env.PORT || 4160;
 
 /* ==================================================== */
 /* ===== Section 2: Configure express middlewares ===== */
@@ -38,11 +39,23 @@ app.use(express.urlencoded({ extended: false }));
 var expressWs = require('express-ws')(app);
 
 var _stdout = "";
+var _csv_proc;
 /* ==================================== */
 /* ===== Section 3: Making Routes ===== */
 /* ==================================== */
 
-
+var run_load_csv = function (){
+    console.log("running load_csv");
+    _csv_proc = child_p.spawn('../load_csv.byte', ['./uploads/uploaded.csv']);  
+    _csv_proc.stdout.on('readable', function (){
+        let data;
+        while (data = this.read()){
+            console.log(data.toString());
+            _stdout = _stdout + data.toString();
+        }
+    });
+    _csv_proc.stdin.on
+}
 
 router.use(function (req,res,next) {
     console.log("/" + req.method);
@@ -92,7 +105,30 @@ app.post('/command', (req, res) => {
     rec_cmd = req.body.cmd;
     //default behavior
     if (rec_cmd == "help"){
-        _stdout = "Current commands: upload";
+        _stdout = "Current commands: upload, load csv";
+    }
+    else if (rec_cmd == "upload") {
+        _stdout = "FAILURE upload command should be processed client-side."
+    }
+    else if (rec_cmd == "load csv"){
+        __stdout = "loading csv";
+        run_load_csv();
+    }
+    else if (rec_cmd.split(' ')[0] == "select"){
+        console.log("sending command " + rec_cmd + "to process")
+        _csv_proc.stdin.write(rec_cmd + "\n")
+    }
+    else if (rec_cmd == "print db"){
+        _csv_proc.stdin.write("print\n")
+    }
+    else if (rec_cmd == "kill db"){
+        _stdout += "Exiting FormalDB process"
+        _csv_proc.stdin.write("exit")
+        _csv_proc.stdin.end()
+    }
+    else if (rec_cmd == "force kill db proc"){
+        _stdout += "Sending kill signal to FormalDB process, this is a hard exit."
+        _csv_proc.kill();
     }
     else{
         _stdout = rec_cmd + " is not a recognized command"
