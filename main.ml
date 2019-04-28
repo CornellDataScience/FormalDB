@@ -72,18 +72,29 @@ let parse_update cmd =
 
 let parse_delete cmd =
   cmd
+(* flag indicates it is parsing the columns  *)
+let rec parse_insert_helper cmd (l1,l2) flag =
+  if flag then
+    begin
+
+    end
+  else
+    begin
+
+    end
 
 let parse_insert cmd =
 begin
   match cmd with
   |[] -> Malformed
   |_:[] -> Malformed
-  |h1::h2::t -> begin
+  |h1::h2::h3::t -> begin
       match h1 with
-      |"into" ->
+      |"into" -> if (h3 != '(') then Malformed else insert h2 (parse_insert_helper t ([],[]) 1)
+      |_ -> Malformed
   end
 end
-
+(* add a space between each parenthesis and the world next to it *)
 let parse (cmd) =
   let comd = List.map (String.lowercase_ascii) cmd in
   match ((String.split_on_char ' ' comd): string list) with
