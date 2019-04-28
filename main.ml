@@ -1,7 +1,6 @@
 open CSV
 open Table2
-open Lymp
-
+(* HOPEFULLY THIS WILL BE IMPLEMENTED WITH A REGEX TOKENIZER *)
 type command =
   | Exit
   | SQL of SQL
@@ -21,16 +20,52 @@ type Conditions =
   |AND of (Conditions * Conditions)
   |NOT of Conditions
   |OR of (Conditions * Conditions)
+  |GT of (Conditions * Conditions)
+  |LT of (Conditions * Conditions)
 
 type Columns =
   |Nil
   |Col of (string * Columns)
 
 let parse_select cmd =
-  cmd
+   cmd
 
+(*  parses the columns to be created for a SQL create command*)
+let parse_create_cols col =
+  match col with
+  |h::t -> if (h != '(') then Malformed else parse_create_helper t []
+
+(*  NOT CORRECT, NEED TO THINK MORE ABOUT TYPES*)
+(* returns the type of the SQL column in our types *)
+let type_of col_type =
+  match col_type with
+  |"int" -> Coq_nat_entry
+  |_ -> Coq_string_entry
+
+(*  Helper for the parse create*)
+let rec parse_create_helper col lst =
+  begin
+  match col with
+  |col_name::col_type::t -> if (col_type.[(length col_type) - 1] != ',') then begin
+      match t with
+      |paren::semicol::[] -> if (paren == ')' && semicol == ';') then Some lst::(col_name, (type_of col_type)) else None
+      |_ -> None
+      end
+    else parse_create_helper t (lst::(col_name, (type_of col_type)))
+  end
+
+(* Parses the SQL create command *)
 let parse_create cmd =
-  cmd
+  match cmd with
+  |[] -> Malformed
+  |_::[] -> Malformed
+  |h1::h2::t -> match h1 with
+    (*  THIS CREATES A TABLE OF NAME  t*)
+    |"table" -> create_tbl h2 (parse_create_cols t)
+    |_ -> Malformed
+
+let parse_conditions conditions =
+  conditions
 
 let parse_update cmd =
   cmd
@@ -39,7 +74,15 @@ let parse_delete cmd =
   cmd
 
 let parse_insert cmd =
-  cmd
+begin
+  match cmd with
+  |[] -> Malformed
+  |_:[] -> Malformed
+  |h1::h2::t -> begin
+      match h1 with
+      |"into" ->
+  end
+end
 
 let parse (cmd) =
   let comd = List.map (String.lowercase_ascii) cmd in
@@ -59,21 +102,3 @@ let parse (cmd) =
       |"delete" -> parse_delete t
       |"insert" -> parse_insert t
     end
-
-
-
-
-let interpreter = "python"
-let py = init ~exec:interpreter "."
-let parsing = get_module py "parsing"
-let parse_sql s = get_string parsing "parse_sql" [Pystr s] in
-
-let main () =
-  ANSITerminal.(print_string [red]
-                  "\n\n Formal DB Terminal");
-  print_endline "Enter SQL Commands \n";
-  print_string  "> ";
-  match read_line () with
-  |exception End_of_file -> ()
-  |exception _ -> print_endline "Invalid commands"
-  | file_name -> play_game file_name
