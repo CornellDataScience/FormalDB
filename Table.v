@@ -4,6 +4,7 @@ Import ListNotations.
 From Coq Require Extraction.
 Require Import ExtrOcamlBasic.
 Require Import ExtrOcamlString.
+Require Import Omega.
 Module Table.
 Open Scope string_scope.
 
@@ -268,6 +269,14 @@ Theorem tbl_unit_test_2 :
   filter_table_by_entry (entry_is_string "Ahad") ("Name") (test_tbl_1) = test_tbl_1.
 Proof. reflexivity. Qed.
 
+Theorem empty_table_is_valid : table_valid empty_table.
+Proof.
+  apply valid_1_2_3. unfold empty_table.
+  + apply empty_rowlist_valid with (rowlist:=[]); try (reflexivity).
+  + apply rows_same_length with (rowlist:=[]); try (reflexivity).
+  + apply cols_same_type with (rowlist:=[]); try (reflexivity).
+Qed.
+
 Theorem add_header_table_is_valid : forall (h : header) (tbl: table),
     table_valid tbl -> table_valid (add_header h tbl).
 Proof.
@@ -306,52 +315,199 @@ Proof.
     -- simpl. trivial.
   - simpl. destruct H. apply H1.
 Qed.
-
-Theorem empty_table_is_valid : table_valid empty_table.
+Lemma entry_type_match_reflect : forall a a0,
+    entry_type_match a a0 = true -> entry_type_match_prop a a0.
 Proof.
-  apply valid_1_2_3. unfold empty_table.
-  + apply empty_rowlist_valid with (rowlist:=[]); try (reflexivity).
-  + apply rows_same_length with (rowlist:=[]); try (reflexivity).
-  + apply cols_same_type with (rowlist:=[]); try (reflexivity).
+  induction a.
+  + intros. simpl. induction a0. auto. simpl in H. discriminate. auto.
+  + induction a0; try (intros; simpl in H; discriminate).
+  - intros. simpl. auto.
+  - intros. simpl. auto.
+    + induction a0; try (intros; simpl in H; discriminate).
+  - intros. simpl. auto.
+  - intros. simpl. auto.
+  - intros. simpl. auto.
 Qed.
 
-Theorem add_row_table_is_valid : forall (r: row) (tbl : table),
+Lemma rw_validity_2_3_reflect : forall r1 r2,
+    row_validity_2_3_bool r1 r2 = true -> row_validity_2_3 r1 r2.
+Proof.
+  induction r1.
+  + intros. simpl. induction r2. auto. simpl in H. discriminate.
+  + intros. simpl. generalize dependent r1. induction r2. intros. discriminate H.
+    intros. simpl in H.
+    rewrite andb_true_iff in H. destruct H. split.
+    -- pose proof entry_type_match_reflect as He. apply He in H. apply H.
+    -- apply IHr1. apply H0.
+Qed.
+                                               
+Lemma row_validity_2_3_bool_is_valid : forall r1 r2,
+    row_validity_2_3_bool r1 r2 = true-> all_rows_same_length (r1::r2::[]) /\
+    all_cols_same_type (r1::r2::[]).
+Proof.
+  induction r1.
+  + intros r2. intros H. split.
+    ++ simpl. split. destruct r2. simpl in H. simpl. reflexivity. simpl in H. discriminate.
+       auto.
+    ++ simpl. split. destruct r2. auto. simpl in H. discriminate. auto.
+  + intros r2. intros H. split. simpl. split. simpl in H. generalize dependent r1. induction r2.
+  - simpl. intros. discriminate.
+  - intros. Search (_ && _ = true). rewrite andb_true_iff in H.
+    destruct H. apply IHr1 in H0. destruct H0. simpl in H0. destruct H0.
+    simpl. Search (S _ = S _). rewrite Nat.succ_inj_wd. apply H0.
+  - trivial.
+  - simpl. split. generalize dependent r1. induction r2.
+    -- intros. simpl in H. discriminate.
+    -- intros. split. subst. simpl in H. rewrite andb_true_iff in H.
+       destruct H. induction a.
+    * simpl. induction a0.
+      ** auto.
+      ** simpl in H. discriminate.
+      ** auto.
+    * simpl. induction a0; try (auto).
+      ** simpl in H. discriminate.
+    * simpl. induction a0; try (auto).
+    * simpl in H. rewrite andb_true_iff in H. destruct H.
+      apply rw_validity_2_3_reflect in H0. apply H0.
+      -- auto.
+Qed.
+Print row_validity_2_3_table.
+Print table.
+Lemma entry_type_match_commutes : forall e0 e1,
+    entry_type_match_prop e0 e1 -> entry_type_match_prop e1 e0.
+Proof.
+  induction e0.
+  + induction e1. intros. simpl. trivial. simpl. trivial. simpl. trivial.
+  + induction e1; intros; try (simpl; trivial).
+  + induction e1; intros; try (simpl; trivial).
+Qed.
+Lemma row_validity_commutes : forall r1 r2,
+    row_validity_2_3 r1 r2 -> row_validity_2_3 r2 r1.
+Proof.
+  intros r1 r2 H.
+  generalize dependent r2.
+  induction r1.
+  + intros r2. induction r2. simpl. trivial. intros.
+    simpl in H. destruct H.
+  + intros r2. induction r2. intros H. simpl. simpl in H. destruct H.
+    simpl. intros. destruct H. split.
+  - pose proof entry_type_match_commutes. apply H1 in H. apply H.
+  - apply IHr1. apply H0.
+Qed.
+    
+Lemma row_validity_2_3_table_is_valid : forall h r1 rowlist,
+    table_valid (rowlist,h) -> row_validity_2_3_table r1 (rowlist) = true ->
+    rowlist <> [] -> table_valid (r1::rowlist, h).
+Proof.
+  intros.
+  constructor.
+  + induction rowlist.
+    * contradiction.
+    * simpl in H0. pose proof row_validity_2_3_bool_is_valid. apply H2 in H0.
+      destruct H0. apply same_length with (rowlist:=(r1::a::rowlist)) (h:=h) (fst_row:=r1).
+      auto. auto. destruct H. destruct H. simpl in H. simpl in H6. subst. destruct H8.
+      injection H. intros. symmetry in H8. subst. rewrite H7. destruct H0. apply H0.
+      subst. simpl in H8. contradiction. simpl in H. subst. contradiction.
+      exists (a::rowlist). reflexivity.
+  + apply rows_same_length with (rowlist:=r1::rowlist). auto.
+    pose proof row_validity_2_3_bool_is_valid. induction rowlist.
+    * contradiction.
+    * apply H2 in H0. destruct H0. destruct H0. remember H. destruct H. destruct t1.
+      simpl in e. subst. split. rewrite H0. reflexivity.
+      apply a0.
+  + apply cols_same_type with (rowlist:=r1::rowlist).
+    ++ induction rowlist.
+    * contradiction.
+    * auto.
+    ++  pose proof row_validity_2_3_bool_is_valid. induction rowlist.
+    * contradiction.
+    * split. simpl in H0. pose proof rw_validity_2_3_reflect.
+      apply H3 in H0. pose proof row_validity_commutes.  apply H4 in H0.
+      apply H0. destruct H. destruct H4. simpl in H4. subst. apply H5.
+Qed.
+
+Lemma beq_reflect : forall  x y, reflect (x = y) (x =? y).
+Proof.
+  intros x y.
+  apply iff_reflect. symmetry. apply beq_nat_true_iff.
+Qed.
+Lemma blt_reflect : forall x y, reflect (x < y) (x <? y).
+Proof.
+  intros x y.
+  apply iff_reflect. symmetry. apply Nat.ltb_lt.
+Qed.
+Lemma ble_reflect : forall  x y, reflect (x <= y) (x <=? y).
+Proof.
+  intros x y.
+  apply iff_reflect. symmetry. apply Nat.leb_le.
+Qed.
+
+Hint Resolve blt_reflect ble_reflect beq_reflect : bdestruct.
+
+Ltac bdestruct X :=
+  let H := fresh in let e := fresh "e" in
+   evar (e: Prop);
+   assert (H: reflect e X); subst e;
+    [eauto with bdestruct
+    | destruct H as [H|H];
+       [ | try first [apply not_lt in H | apply not_le in H]]].
+
+Theorem add_row_table_is_valid : forall (r: row) (tbl: table),
     table_valid tbl -> table_valid (add_row r tbl).
 Proof.
-  induction r.
-  + intros tbl. intros H. induction tbl. simpl.
-    destruct (header_matches_first_row b [] a) eqn:Heq.
-    ++ destruct (row_validity_2_3_table [] a) eqn:Hrow_valid.
-       +++ simpl. destruct b eqn:Hheader. (** destruct on the header **)
-           destruct a eqn:Hrowlist.
-  - apply H.
-  - apply H.
-  - destruct a eqn:Hrowlist.
-    -- simpl in Heq. discriminate.
-    -- simpl in Hrow_valid. destruct r eqn:Hr.
-    * destruct H. destruct H; subst. simpl in H3. destruct H4. simpl in H. injection H.
-      intros H_l_x. intros H_fst_row. subst. simpl in H3. discriminate.
-      simpl in H3. discriminate. simpl in H2.  discriminate H2.
-    * simpl in Hrow_valid. discriminate.
-      +++ simpl. destruct b eqn:Hheader; apply H.
-      ++ simpl. destruct b eqn:Hb; apply H.
-    + intros tbl. intros H. induction tbl.
-      ++ destruct b.
-         +++ simpl. apply H.
-         +++ simpl. destruct (header_matches_first_row (s :: b) (a :: r) a0) eqn:Hhead.
-             destruct (row_validity_2_3_table (a::r) a0) eqn:Hrow_valid.
-  - simpl. apply valid_1_2_3.
-    -- apply same_length with (h:=s::b) (fst_row:=(a::r)) (rowlist:=(a::r)::a0); try(reflexivity).
-    * 
-  - apply valid_1_2_3.
-    * apply empty_header_valid with (rowlist:=[[]]) (h:=[]); try (reflexivity).
-      ** simpl. reflexivity.
-      ** simpl. try (reflexivity).
-      * apply rows_same_length with (rowlist:=[]); try (reflexivity).
-      * apply cols_same_type with (rowlist:=[]); try (reflexivity).
-       
+  intros r tbl.
+  generalize dependent r.
+  destruct tbl.
+  generalize dependent h.
+  induction l.
+  + intros. simpl. bdestruct (Datatypes.length h =? Datatypes.length r). simpl.
+    destruct h. apply H.
+    constructor.
+    * destruct H. apply same_length with (h:=(s::h)) (fst_row:=r) (rowlist:=[r]).
+      auto. auto. apply H0. exists []. reflexivity.
+    * destruct H. destruct H1. simpl in H1. subst.
+      apply rows_same_length with (rowlist:=[r]). auto. auto.
+    * apply cols_same_type with (rowlist:=[r]). auto. simpl. trivial.
+    * simpl. destruct h. apply H. apply H.
+  + intros. simpl. destruct h. apply H.
+    destruct (row_validity_2_3_bool a r) eqn:Hr.
+    pose proof row_validity_2_3_table_is_valid.
+    apply H0. apply H. simpl. apply Hr. unfold not. intros. discriminate.
+    apply H.
+Qed.
 
-(** END unit tests **)
+Theorem filter_mantains_header : forall f ident h rowlist h' rowlist',
+    filter_table_by_entry f ident (rowlist, h) = (rowlist', h') -> h = h'.
+Proof.
+  intros.
+  destruct ident.
+  simpl in H. injection H. intros. apply H0.
+  simpl in H. injection H. intros. apply H0.
+Qed.
+
+Inductive table_constructed (tbl: table) := 
+| empty_constructed : tbl = empty_table -> table_constructed tbl
+| add_header_constructed (sub_tbl : table) (h : header) :  table_constructed sub_tbl ->
+                                           add_header h sub_tbl = tbl ->
+                                           table_constructed tbl
+| add_row_constructed (sub_tbl : table) (r: row) : table_constructed sub_tbl ->
+                                        add_row r sub_tbl = tbl ->
+                                        table_constructed tbl.
+                                                          
+Theorem remove_added_row_is_valid : forall r tbl,
+    table_valid (add_row r tbl) -> table_valid tbl.
+Proof.
+  intros.
+  pose proof add_row_table_is_valid.
+  constructor.
+  + destruct tbl. destruct h. simpl in H. apply H.
+    simpl in H. destruct (header_matches_first_row (s::h) r l) eqn:Heq.
+    destruct (row_validity_2_3_table r l) eqn:Heq2. simpl in H.
+    destruct l. simpl in Heq. destruct (Datatypes.length r
+
+
+
+
 Theorem filter_row_true_implies_length_match : forall (r: row) (h: header) (col_ident : string) (f: entry -> bool),
     filter_row_by_entry f col_ident h r = true -> List.length h = List.length r.
 Proof.
@@ -364,66 +520,6 @@ Proof.
 Abort.
 (** these proofs are hardddddddddd :( **)
 
-Theorem remove_first_inverse_of_add_row_on_headed_empty_table : forall (r: row) (h: header) ,
-    remove_first_row_from_table r (add_row r (add_header h empty_table)) = (add_header h empty_table).
-Proof.
-  intros r h.
-  simpl. induction r.
-  - simpl. destruct (Datatypes.length h =? 0) eqn:Heq.
-    + simpl. reflexivity.
-    + simpl. reflexivity.
-  - simpl. destruct a.
-    -- simpl. destruct (string_dec s s). simpl. destruct (row_eqb r r).
-    + simpl. destruct (Datatypes.length h =? S (Datatypes.length r)) eqn:Heq.
-      ++ simpl. destruct (string_dec s s). simpl. destruct (row_eqb r r). reflexivity.
-         reflexivity. simpl. reflexivity.
-      ++ simpl. reflexivity.
-    + destruct (Datatypes.length h =? S (Datatypes.length r)) eqn:Heq. simpl.
-      destruct (string_dec s s). simpl. destruct (row_eqb r r). reflexivity. reflexivity.
-      simpl. reflexivity. simpl. reflexivity.
-    + destruct n. reflexivity.
-    -- simpl. induction n.
-    + simpl. destruct (Datatypes.length h =? S (Datatypes.length r)) eqn:Heq. simpl.
-      destruct (row_eqb r r). simpl. reflexivity. reflexivity. simpl. reflexivity. 
-    +simpl.  destruct (Datatypes.length h =? S (Datatypes.length r)) eqn:Heq. simpl.
-     rewrite Nat.eqb_refl. simpl. destruct (row_eqb r r). reflexivity.
-     reflexivity. simpl. reflexivity.
-     -- destruct (Datatypes.length h =? S (Datatypes.length r)) eqn:Heq. simpl. reflexivity.
-        simpl. reflexivity.
-Qed.
-
-(** The false filter is like 0 if filtering is mulitplication *)
-Lemma name_this : forall (r : row) (h: header) (col_ident : string) (a: entry) (f: entry -> bool),
-    f = (fun e => false) -> filter_row_by_entry f col_ident h (a::r) = filter_row_by_entry f col_ident h r.
-Proof.
-  intros r h col_ident a f H_f.
-  induction r.
-  +induction h.
-  -simpl. reflexivity.
-  -simpl. destruct (string_dec col_ident a0) eqn:H_eq.
-   -- rewrite H_f. reflexivity.
-   -- induction h.
-      --- reflexivity.
-      --- reflexivity.
-   + induction h.
-  - simpl. reflexivity.
-  - simpl. destruct (string_dec col_ident a1) eqn: Heq.
-    -- rewrite H_f. reflexivity.
-Abort.
-Theorem filter_property_of_false_filter_on_rows : forall (r : row) (h: header) (col_ident : string) (f: entry -> bool),
-    f = (fun e => false) -> filter_row_by_entry f col_ident h r = false.
-Proof.
-  intros r h col_ident f H.
-  induction h.
-  + induction r.
-  -reflexivity.
-  -reflexivity.
-   + destruct (string_dec col_ident a) eqn:Heq.
-  - destruct r. reflexivity. simpl. rewrite Heq. rewrite H. reflexivity.
-  - induction r.
-    -- reflexivity.
-    -- simpl. rewrite Heq.
-Abort.
 End Table.
 
 Extract Inductive bool ⇒ "bool" [ "true" "false" ].

@@ -1,0 +1,60 @@
+aaaaaaaaaaaTheorem remove_first_inverse_of_add_row_on_headed_empty_table : forall (r: row) (h: header) ,
+    remove_first_row_from_table r (add_row r (add_header h empty_table)) = (add_header h empty_table).
+Proof.
+  intros r h.
+  simpl. induction r.
+  - simpl. destruct (Datatypes.length h =? 0) eqn:Heq.
+    + simpl. reflexivity.
+    + simpl. reflexivity.
+  - simpl. destruct a.
+    -- simpl. destruct (string_dec s s). simpl. destruct (row_eqb r r).
+    + simpl. destruct (Datatypes.length h =? S (Datatypes.length r)) eqn:Heq.
+      ++ simpl. destruct (string_dec s s). simpl. destruct (row_eqb r r). reflexivity.
+         reflexivity. simpl. reflexivity.
+      ++ simpl. reflexivity.
+    + destruct (Datatypes.length h =? S (Datatypes.length r)) eqn:Heq. simpl.
+      destruct (string_dec s s). simpl. destruct (row_eqb r r). reflexivity. reflexivity.
+      simpl. reflexivity. simpl. reflexivity.
+    + destruct n. reflexivity.
+    -- simpl. induction n.
+    + simpl. destruct (Datatypes.length h =? S (Datatypes.length r)) eqn:Heq. simpl.
+      destruct (row_eqb r r). simpl. reflexivity. reflexivity. simpl. reflexivity. 
+    +simpl.  destruct (Datatypes.length h =? S (Datatypes.length r)) eqn:Heq. simpl.
+     rewrite Nat.eqb_refl. simpl. destruct (row_eqb r r). reflexivity.
+     reflexivity. simpl. reflexivity.
+     -- destruct (Datatypes.length h =? S (Datatypes.length r)) eqn:Heq. simpl. reflexivity.
+        simpl. reflexivity.
+Qed.
+
+(** The false filter is like 0 if filtering is mulitplication *)
+Lemma name_this : forall (r : row) (h: header) (col_ident : string) (a: entry) (f: entry -> bool),
+    f = (fun e => false) -> filter_row_by_entry f col_ident h (a::r) = filter_row_by_entry f col_ident h r.
+Proof.
+  intros r h col_ident a f H_f.
+  induction r.
+  +induction h.
+  -simpl. reflexivity.
+  -simpl. destruct (string_dec col_ident a0) eqn:H_eq.
+   -- rewrite H_f. reflexivity.
+   -- induction h.
+      --- reflexivity.
+      --- reflexivity.
+   + induction h.
+  - simpl. reflexivity.
+  - simpl. destruct (string_dec col_ident a1) eqn: Heq.
+    -- rewrite H_f. reflexivity.
+Abort.
+Theorem filter_property_of_false_filter_on_rows : forall (r : row) (h: header) (col_ident : string) (f: entry -> bool),
+    f = (fun e => false) -> filter_row_by_entry f col_ident h r = false.
+Proof.
+  intros r h col_ident f H.
+  induction h.
+  + induction r.
+  -reflexivity.
+  -reflexivity.
+   + destruct (string_dec col_ident a) eqn:Heq.
+  - destruct r. reflexivity. simpl. rewrite Heq. rewrite H. reflexivity.
+  - induction r.
+    -- reflexivity.
+    -- simpl. rewrite Heq.
+Abort.
