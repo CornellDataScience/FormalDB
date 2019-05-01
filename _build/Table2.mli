@@ -20,12 +20,12 @@ module Table2 :
 
   type entry =
   | Coq_string_entry of char list
-  | Coq_nat_entry of int
+  | Coq_nat_entry of float
   | Coq_nil_entry
 
-  val entry_rect : (char list -> 'a1) -> (int -> 'a1) -> 'a1 -> entry -> 'a1
+  val entry_rect : (char list -> 'a1) -> (float -> 'a1) -> 'a1 -> entry -> 'a1
 
-  val entry_rec : (char list -> 'a1) -> (int -> 'a1) -> 'a1 -> entry -> 'a1
+  val entry_rec : (char list -> 'a1) -> (float -> 'a1) -> 'a1 -> entry -> 'a1
 
   type row = entry list
 

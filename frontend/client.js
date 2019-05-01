@@ -1,3 +1,6 @@
+var url_f = "ws://" + window.location.hostname + ":" + window.location.port +  "/setnextfilename"
+const connection_f = new WebSocket(url_f)
+
 window.addEventListener('load', function() {
     document.getElementById('cli').onkeydown = function(e){
         if(e.keyCode == 13){
@@ -11,6 +14,7 @@ window.addEventListener('load', function() {
      var url_s = "ws://" + window.location.hostname + ":" + window.location.port +  "/stdout"
      const connection = new WebSocket(url_e)
      const connection_s = new WebSocket(url_s)
+     
 
      connection_s.onopen = () => {
          window.setInterval(check_stdout, 1000);
@@ -32,6 +36,13 @@ window.addEventListener('load', function() {
         console.log(e.data)
      }
 
+     connection_f.onmessage = e => {
+         if (e.data == "filename set") {
+            document.getElementById("upload").action = "/upload_additional"
+            document.getElementById("upload").submit();
+         }
+     }
+
 
 })
 
@@ -39,7 +50,12 @@ window.addEventListener('load', function() {
 
 function parse_command (command) {
     if (command == "upload"){
+        document.getElementById("upload").action = "/upload"
         document.getElementById("upload").submit();
+    }
+    else if (command.substring(0,9) == "upload as"){
+        var alias = command.substring(10)
+        connection_f.send(alias)
     }
     else if (command == "clear"){
         document.getElementById("output").innerHTML = "";

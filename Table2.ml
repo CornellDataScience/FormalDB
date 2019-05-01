@@ -1,4 +1,3 @@
-
 type __ = Obj.t
 let __ = let rec f _ = Obj.repr f in Obj.repr f
 
@@ -67,7 +66,7 @@ module Table2 =
 
   type entry =
   | Coq_string_entry of char list
-  | Coq_nat_entry of int
+  | Coq_nat_entry of float
   | Coq_nil_entry
 
   (** val entry_rect : (char list -> 'a1) -> (int -> 'a1) -> 'a1 -> entry -> 'a1 **)
@@ -169,7 +168,7 @@ module Table2 =
        | Coq_string_entry s2 -> if string_dec s1 s2 then true else false
        | _ -> false)
     | Coq_nat_entry n1 -> (match e2 with
-                           | Coq_nat_entry n2 -> Nat.eqb n1 n2
+                           | Coq_nat_entry n2 -> (=) n1 n2
                            | _ -> false)
     | Coq_nil_entry -> false
 
@@ -253,7 +252,7 @@ module Table2 =
   match r with 
   | [] -> ()
   | h::t -> match h with 
-            | Coq_nat_entry n -> print_int n; print_string "\t"; print_row t
+            | Coq_nat_entry n -> print_float n; print_string "\t"; print_row t
             | Coq_nil_entry -> print_string ("[NULL_ENTRY]" ^ "\t"); print_row t
             | Coq_string_entry s -> print_string (implode(s) ^ "\t"); print_row t
 

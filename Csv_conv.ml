@@ -39,11 +39,14 @@ let rowlist_from_csv csv =
 let is_int s =
     try (int_of_string s); ((int_of_string s) >= 0)
     with _ -> false
-
+let is_float s =
+    try (float_of_string s); true 
+    with _ -> false
 let rec entry_list_from_csv_row row =
     match row with 
     | [] -> []
     | h::t when (h = "") -> Table2.Coq_nil_entry :: (entry_list_from_csv_row t)
+    | h::t when (is_float h) -> Table2.Coq_nat_entry (float_of_string h) :: (entry_list_from_csv_row t)
     | h::t -> (Table2.Coq_string_entry (explode h)) :: (entry_list_from_csv_row t)
 
 

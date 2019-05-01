@@ -12,6 +12,7 @@ const logger = require('morgan');
 var router = express.Router();
 var engine = require('consolidate');
 var child_p = require('child_process');
+var sanitize = require('sanitize-filename')
 var path = __dirname;
 
 // Define port for app to listen on
@@ -39,6 +40,7 @@ app.use(express.urlencoded({ extended: false }));
 var expressWs = require('express-ws')(app);
 
 var _stdout = "";
+var _next_filename;
 var _csv_proc;
 /* ==================================== */
 /* ===== Section 3: Making Routes ===== */
@@ -76,6 +78,40 @@ router.ws('/echo', function(ws, req){
     });
 });
 
+function get_filename() {
+    return _next_filename + ".csv";
+}
+
+var storage_additional = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, './uploads')
+    },
+    filename: function (req, file, cb) {
+      cb(null, get_filename())
+    }
+  })
+   
+var upload_additional = multer({ storage: storage_additional})
+
+router.ws('/setnextfilename', function(ws, req){
+    ws.on('message', function(msg) {
+        _next_filename = sanitize(msg)
+        
+        storage_additional = multer.diskStorage({
+            destination: function (req, file, cb) {
+              cb(null, './uploads')
+            },
+            filename: function (req, file, cb) {
+              cb(null, _next_filename)
+            }
+          })
+        
+        upload_additional = multer({storage: storage_additional})
+        ws.send("filename set")
+        
+    });
+});
+
 router.ws('/stdout', function(ws, req){
     ws.on('message', function(msg) {
         if (msg == "request stdout"){
@@ -100,12 +136,13 @@ var storage = multer.diskStorage({
 
 upload = multer({ storage: storage })
 
+
 app.post('/command', (req, res) => {
     console.log("Processing command :" + req.body.cmd);
     rec_cmd = req.body.cmd;
     //default behavior
     if (rec_cmd == "help"){
-        _stdout = "Current commands: upload, load csv";
+        _stdout = "Current commands: upload, load csv, select where {ident}={target}, add row {csv row}, exit db, kill db, print db";
     }
     else if (rec_cmd == "upload") {
         _stdout = "FAILURE upload command should be processed client-side."
@@ -118,15 +155,22 @@ app.post('/command', (req, res) => {
         console.log("sending command " + rec_cmd + "to process")
         _csv_proc.stdin.write(rec_cmd + "\n")
     }
+    else if (rec_cmd.split(' ')[0] == "add"){
+        console.log("sending command " + rec_cmd + "to process")
+        _csv_proc.stdin.write(rec_cmd + "\n")
+    }
     else if (rec_cmd == "print db"){
         _csv_proc.stdin.write("print\n")
     }
-    else if (rec_cmd == "kill db"){
+    else if (rec_cmd.split(' ')[0] == "print"){
+        _csv_proc.stdin.write(rec_cmd + "\n")
+    }
+    else if (rec_cmd == "exit db"){
         _stdout += "Exiting FormalDB process"
         _csv_proc.stdin.write("exit")
         _csv_proc.stdin.end()
     }
-    else if (rec_cmd == "force kill db proc"){
+    else if (rec_cmd == "kill db"){
         _stdout += "Sending kill signal to FormalDB process, this is a hard exit."
         _csv_proc.kill();
     }
@@ -146,6 +190,31 @@ app.post('/upload', upload.single('csv_file'), (req, res) => {
         console.log("File " + filename + " loaded.")
 
         _stdout = "File uploaded successfully"
+        
+
+    } else {
+        console.log('No File Uploaded');
+        var filename = 'FILE NOT UPLOADED';
+        var uploadStatus = 'File Upload Failed';
+        _stdout = "File upload FAILED"
+    }
+    
+    res.status(204)
+    res.end()
+    
+});
+
+
+
+app.post('/upload_additional', upload_additional.single('csv_file'), (req, res) => {
+    if (req.file) {
+        console.log('Uploading file...');
+        var filename = req.file.filename;
+
+        var uploadStatus = 'File Uploaded Successfully';
+        console.log("File " + filename + " loaded.")
+        _csv_proc.stdin.write("load ./uploads/" + _next_filename + ".csv as " + _next_filename + "\n")
+
         
 
     } else {
