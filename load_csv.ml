@@ -19,13 +19,8 @@ let rec print_row r =
 
 let csv_to_Table2 csv =
   let t_header = CSV_conv.string_list_to_char_matrix (CSV_conv.header_from_csv csv) in
-<<<<<<< HEAD
   let t_entry_rowlist = CSV_conv.entry_rowlist_from_csv_rowlist (CSV_conv.rowlist_from_csv csv) in
   let fdb = Table2.add_header t_header (Table2.empty_table) in 
-=======
-  let t_entry_rowlist = CSV_conv.entry_rowlist_from_csv_rowlist (CSV_conv.rowlist_from_csv csv_lst) in
-  let fdb = Table2.add_header t_header (Table2.empty_table) in
->>>>>>> fc2872165ad376b8de0d362a234f77ffe2099416
   let fdb = CSV_conv.add_rowlist_to_table (t_entry_rowlist) (fdb)
   in fdb
 
@@ -66,12 +61,8 @@ let add_table (table_alias : string) (table_path) (tbl_list) : unit =
 type command =
  | Exit
  | Select_where of (string * string)
-<<<<<<< HEAD
  | Select_from_where_eq of (string * string * string)
  | Print of string 
-=======
- | Print
->>>>>>> fc2872165ad376b8de0d362a234f77ffe2099416
  | Malformed
  | Add_row of string
  | Load of (string * string)
@@ -79,15 +70,9 @@ type command =
 let parse (cmd) =
  match ((String.split_on_char ' ' cmd): string list) with
  | [] -> Malformed
-<<<<<<< HEAD
  | h::[] -> begin 
             match h with 
             | "print" -> Print "main"
-=======
- | h::[] -> begin
-            match h with
-            | "print" -> Print
->>>>>>> fc2872165ad376b8de0d362a234f77ffe2099416
             | "exit" -> Exit
             | _ -> Malformed
             end
@@ -132,7 +117,6 @@ let parse (cmd) =
 let rec main_loop (tbl : Table2.table) (tbl_list : ((string, Table2.table) Hashtbl.t))=
   match read_line () |> parse with
   | Exit -> exit 0;
-<<<<<<< HEAD
   | Print alias ->  begin 
                     match alias with 
                     | "main" -> Table2.print_table (tbl); main_loop tbl tbl_list
@@ -174,16 +158,3 @@ let fdb = csv_to_Table2 csv_lst
 let () = print_string "Here is the prettified CSV output loaded into the FormalDB \n\n"
 let () = Table2.print_table (fdb) 
 let () = main_loop fdb (Hashtbl.create 5)
-=======
-  | Print -> Table2.print_table (tbl); main_loop tbl
-  | Malformed -> print_string ("Error: Malformed command\n"); main_loop tbl
-  | Select_where (h_iden, target) -> print_string ("Here is the resultant table: \n\n");
-                                     let new_tbl = select_where h_iden target tbl in
-                                     Table2.print_table (new_tbl); main_loop (new_tbl)
-
-
-let fdb = csv_to_Table2 csv_lst
-let () = print_string "Here is the prettified CSV output loaded into the FormalDB \n\n"
-let () = Table2.print_table (fdb)
-let () = main_loop fdb
->>>>>>> fc2872165ad376b8de0d362a234f77ffe2099416
