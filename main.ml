@@ -1,5 +1,6 @@
 open CSV
 open Table2
+
 (* HOPEFULLY THIS WILL BE IMPLEMENTED WITH A REGEX TOKENIZER *)
 type command =
   | Exit
@@ -76,11 +77,17 @@ let parse_delete cmd =
 let rec parse_insert_helper cmd (l1,l2) flag =
   if flag then
     begin
-
+    match cmd with
+      |h::h1::t ->
+        if (h1 == "values") then parse_insert_helper t (h::l1,l2) 0 else
+          parse_insert_helper h1::t (h::l1,l2) 1
+      |_ -> None  
     end
   else
     begin
-
+      match cmd with
+      |h::[] -> Some (l1, h::l2)
+      |h::t -> parse_insert_helper t (l1 , h::l2) 0
     end
 
 let parse_insert cmd =
@@ -88,9 +95,9 @@ begin
   match cmd with
   |[] -> Malformed
   |_:[] -> Malformed
-  |h1::h2::h3::t -> begin
+  |h1::h2::t -> begin
       match h1 with
-      |"into" -> if (h3 != '(') then Malformed else insert h2 (parse_insert_helper t ([],[]) 1)
+      |"into" -> if (t[0] != '(') then Malformed else insert h2 (parse_insert_helper t ([],[]) 1)
       |_ -> Malformed
   end
 end
