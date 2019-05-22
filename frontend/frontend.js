@@ -16,7 +16,7 @@ var sanitize = require('sanitize-filename')
 var path = __dirname;
 
 // Define port for app to listen on
-const port =  process.env.PORT || 4160;
+const port =  process.env.PORT || 4158;
 
 /* ==================================================== */
 /* ===== Section 2: Configure express middlewares ===== */

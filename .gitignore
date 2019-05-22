@@ -2,6 +2,9 @@ bin/*
 .*
 *.glob
 *.vo
+_tags
+Table.ml
+Table.mli
 
 # Compiled source #
 ###################
@@ -40,3 +43,4 @@ bin/*
 .Trashes
 ehthumbs.db
 Thumbs.db
+*.byte
